@@ -246,3 +246,24 @@ f.x=Math.random()*canvas.width
 }
 
 setInterval(drawSnow,33)
+
+function toggleLock(){
+
+let pass=prompt("Admin Password")
+
+if(pass!==ADMIN_PASSWORD){
+
+alert("Wrong password")
+return
+
+}
+
+bookingLocked=!bookingLocked
+
+db.collection("settings").doc("booking").set({
+
+locked:bookingLocked
+
+})
+
+}
