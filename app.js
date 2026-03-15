@@ -5,21 +5,32 @@ const ADMIN_PASSWORD="2737admin"
 
 const grid=document.getElementById("slots")
 
-const allianceColors={}
-const colorList=["#8fb3ff","#ffb3b3","#ffd6a5","#caffbf","#d0b3ff"]
+const svsDate=new Date("2026-03-23T00:00:00Z")
 
-function getAllianceColor(tag){
+function updateCountdown(){
 
-if(!allianceColors[tag]){
+let now=new Date()
 
-let index=Object.keys(allianceColors).length%colorList.length
-allianceColors[tag]=colorList[index]
+let diff=svsDate-now
+
+if(diff<0){
+
+document.getElementById("countdown").innerHTML="SVS Started!"
+return
 
 }
 
-return allianceColors[tag]
+let d=Math.floor(diff/(1000*60*60*24))
+let h=Math.floor((diff/(1000*60*60))%24)
+let m=Math.floor((diff/(1000*60))%60)
+
+document.getElementById("countdown").innerHTML=
+"SVS begins in "+d+"d "+h+"h "+m+"m"
 
 }
+
+setInterval(updateCountdown,60000)
+updateCountdown()
 
 function generateSlots(){
 
@@ -51,16 +62,16 @@ let data=doc.data()
 if(!data){
 
 div.className="slot available"
+
 div.innerHTML="<b>"+time+" UTC</b><br>"+local+" Local<br>Available"
+
 div.onclick=()=>openModal(id)
 
 }else{
 
-let color=getAllianceColor(data.alliance)
-
 div.className="slot reserved"
 
-div.innerHTML="<b>"+time+" UTC</b><br>"+local+" Local<br><span style='color:"+color+"'>["+data.alliance+"]</span> "+data.player
+div.innerHTML="<b>"+time+" UTC</b><br>"+local+" Local<br>"+data.alliance+" - "+data.player
 
 div.onclick=()=>cancelSlot(id,data.password)
 
@@ -153,53 +164,21 @@ document.getElementById("stats").innerHTML=html
 
 }
 
-generateSlots()
-updateStats()
-
-const svsDate=new Date("2026-03-23T00:00:00Z")
-
-function updateCountdown(){
-
-let now=new Date()
-
-let diff=svsDate-now
-
-if(diff<0){
-
-document.getElementById("countdown").innerHTML="SVS Started!"
-return
-
-}
-
-let d=Math.floor(diff/(1000*60*60*24))
-let h=Math.floor((diff/(1000*60*60))%24)
-let m=Math.floor((diff/(1000*60))%60)
-
-document.getElementById("countdown").innerHTML=
-"SVS begins in "+d+"d "+h+"h "+m+"m"
-
-}
-
-setInterval(updateCountdown,60000)
-
-updateCountdown()
-
-
 function updateCounts(){
 
 db.collection("slots").onSnapshot(snapshot=>{
 
 let reserved=snapshot.size
-
 let total=48
-
 let available=total-reserved
 
-document.getElementById("reservedCount").innerText=reserved
-document.getElementById("availableCount").innerText=available
+document.getElementById("reservedCount").innerText=available
+document.getElementById("availableCount").innerText=reserved
 
 })
 
 }
 
+generateSlots()
+updateStats()
 updateCounts()
