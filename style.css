@@ -20,6 +20,25 @@ color:#444;
 
 }
 
+.adminButton{
+
+position:absolute;
+top:20px;
+right:20px;
+
+}
+
+.adminButton button{
+
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#444;
+color:white;
+cursor:pointer;
+
+}
+
 .tabs{
 
 margin:20px;
@@ -39,12 +58,6 @@ background:#7da7ff;
 color:white;
 font-weight:bold;
 cursor:pointer;
-
-}
-
-.tabs button:hover{
-
-background:#6b95f0;
 
 }
 
@@ -161,11 +174,29 @@ cursor:pointer;
 
 }
 
-#adminPanel{
+.adminPanel{
 
+display:none;
 position:fixed;
-bottom:10px;
-right:10px;
+top:30%;
+left:50%;
+transform:translateX(-50%);
+background:white;
+padding:25px;
+border-radius:14px;
+box-shadow:0 0 20px rgba(0,0,0,0.2);
+
+}
+
+.adminPanel button{
+
+margin:6px;
+padding:10px 14px;
+border:none;
+border-radius:8px;
+background:#7da7ff;
+color:white;
+cursor:pointer;
 
 }
 
@@ -186,25 +217,5 @@ z-index:-1;
 .grid{
 grid-template-columns:1fr 1fr;
 }
-
-}
-
-.adminTop{
-
-position:absolute;
-top:20px;
-right:20px;
-
-}
-
-.adminTop button{
-
-padding:10px 14px;
-border:none;
-border-radius:10px;
-background:#444;
-color:white;
-cursor:pointer;
-font-size:13px;
 
 }
