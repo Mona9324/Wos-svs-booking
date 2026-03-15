@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html>
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>2737 SvS Booking</title>
+<title>2737 SVS Booking</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -16,22 +16,46 @@
 
 <header>
 
-<h1>❄ 2737 SvS Booking</h1>
-
+<h1>❄ 2737 SVS Booking</h1>
 <div id="countdown"></div>
 
 </header>
 
 <div class="tabs">
 
-<button onclick="switchBuff('construction')">🏗 Construction</button> <button onclick="switchBuff('research')">🔬 Research</button> <button onclick="switchBuff('training')">🛡 Training</button>
+<button onclick="switchBuff('construction')">Construction</button> <button onclick="switchBuff('research')">Research</button> <button onclick="switchBuff('training')">Training</button>
 
 </div>
 
-<div class="grid" id="slots"></div>
+<div id="slots" class="grid"></div>
+
+<div id="modal" class="modal">
+
+<div class="modalBox">
+
+<h3>Reserve Slot</h3>
+
+<input id="alliance" placeholder="Alliance tag">
+
+<input id="player" placeholder="Player name">
+
+<input id="password" type="password" placeholder="Cancel password">
+
+<button onclick="confirmBooking()">Confirm</button> <button onclick="closeModal()">Cancel</button>
+
+</div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script src="firebase.js"></script>
 
 <script src="app.js"></script>
 
 </body>
 </html>
+
 
