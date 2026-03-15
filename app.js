@@ -1,3 +1,10 @@
+function switchBuff(buff){
+
+currentBuff=buff
+generateSlots()
+
+}
+
 let currentBuff="construction"
 let selectedSlot=null
 
@@ -172,8 +179,8 @@ let reserved=snapshot.size
 let total=48
 let available=total-reserved
 
-document.getElementById("reservedCount").innerText=available
-document.getElementById("availableCount").innerText=reserved
+document.getElementById("reservedCount").innerText=reserved
+document.getElementById("availableCount").innerText=available
 
 })
 
@@ -182,3 +189,70 @@ document.getElementById("availableCount").innerText=reserved
 generateSlots()
 updateStats()
 updateCounts()
+
+const canvas=document.getElementById("snow")
+const ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+let snowflakes=[]
+
+for(let i=0;i<120;i++){
+
+snowflakes.push({
+
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*3+1,
+d:Math.random()*1
+
+})
+
+}
+
+function drawSnow(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+ctx.fillStyle="rgba(200,220,255,0.8)"
+
+ctx.beginPath()
+
+for(let i=0;i<snowflakes.length;i++){
+
+let f=snowflakes[i]
+
+ctx.moveTo(f.x,f.y)
+
+ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true)
+
+}
+
+ctx.fill()
+
+moveSnow()
+
+}
+
+function moveSnow(){
+
+for(let i=0;i<snowflakes.length;i++){
+
+let f=snowflakes[i]
+
+f.y+=f.d
+f.x+=Math.sin(f.y*0.01)
+
+if(f.y>canvas.height){
+
+f.y=0
+f.x=Math.random()*canvas.width
+
+}
+
+}
+
+}
+
+setInterval(drawSnow,33)
