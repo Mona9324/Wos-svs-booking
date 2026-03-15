@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
 <html>
-
 <head>
 
 <meta charset="UTF-8">
@@ -20,21 +19,22 @@
 <header>
 
 <h1>❄ 2737 SVS Booking</h1>
+
 <div id="countdown"></div>
-
-</header>
-
-<div class="tabs">
-
-<button onclick="switchBuff('monday')">Monday (Construction)</button> <button onclick="switchBuff('tuesday')">Tuesday (Research)</button> <button onclick="switchBuff('thursday')">Thursday (Training)</button>
-
-</div>
 
 <div class="slotStats">
 
 <span class="availableDot"></span> <span id="availableCount">0</span>
 
 <span class="reservedDot"></span> <span id="reservedCount">0</span>
+
+</div>
+
+</header>
+
+<div class="tabs">
+
+<button onclick="switchBuff('monday')">Monday (Construction)</button> <button onclick="switchBuff('tuesday')">Tuesday (Research)</button> <button onclick="switchBuff('thursday')">Thursday (Training)</button>
 
 </div>
 
@@ -48,9 +48,9 @@
 
 <input id="alliance" placeholder="Alliance">
 
-<input id="player" placeholder="Player Name">
+<input id="player" placeholder="Player">
 
-<input id="Speed-up" type="number" placeholder="Speed-up">
+<input id="daysSaved" type="number" placeholder="Days Saved">
 
 <input id="password" type="password" placeholder="Cancel Password">
 
@@ -60,34 +60,26 @@
 
 </div>
 
-<div id="copyBox" class="copyBox">
-
-<div id="copyText"></div>
-
-<button onclick="copyDiscord()">Copy for Discord</button>
-
-</div>
-
 <button class="adminFloating" onclick="openAdmin()">⚙ Admin</button>
 
 <div id="adminPanel" class="adminPanel">
 
-<h3>관리자 메뉴</h3>
+<h3>관리자 패널</h3>
 
-<div id="관리자 로그인">
+<div id="adminLogin">
 
-<input id="adminPass" type="password" placeholder="Admin Password">
-<button onclick="adminLogin()">Login</button>
+<input id="adminPass" type="password" placeholder="관리자 비밀번호">
+<button onclick="adminLogin()">로그인</button>
 
 </div>
 
 <div id="adminControls">
 
-<button onclick="setBooking(true)">🔓 예약 오픈</button> <button onclick="setBooking(false)">🔒 예약 잠금</button> <button onclick="clearAll()">🧹 슬롯 리셋</button>
+<button onclick="setBooking(true)">예약 열기</button> <button onclick="setBooking(false)">예약 잠금</button> <button onclick="clearAll()">전체 예약 삭제</button>
 
 </div>
 
-<button onclick="closeAdmin()">Close</button>
+<button onclick="closeAdmin()">닫기</button>
 
 </div>
 
