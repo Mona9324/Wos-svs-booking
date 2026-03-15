@@ -1,23 +1,60 @@
 body{
+
 font-family:Arial;
 background:#eef5fb;
 margin:0;
 text-align:center;
+
 }
 
 header{
+
 padding:20px;
+
+}
+
+.slotStats{
+
+margin-top:10px;
+font-size:18px;
+
+}
+
+.availableDot{
+
+width:10px;
+height:10px;
+background:#8bd18b;
+display:inline-block;
+border-radius:50%;
+margin-right:6px;
+
+}
+
+.reservedDot{
+
+width:10px;
+height:10px;
+background:#d98c8c;
+display:inline-block;
+border-radius:50%;
+margin-left:20px;
+margin-right:6px;
+
 }
 
 .tabs{
+
 margin:20px;
 display:flex;
 justify-content:center;
-gap:10px;
+gap:12px;
 flex-wrap:wrap;
+
 }
 
 .tabs button{
+
 padding:14px 20px;
 border:none;
 border-radius:12px;
@@ -25,40 +62,51 @@ background:#7da7ff;
 color:white;
 font-weight:bold;
 cursor:pointer;
+
 }
 
 .grid{
+
 display:grid;
 grid-template-columns:repeat(4,1fr);
 gap:14px;
 padding:20px;
 max-width:900px;
 margin:auto;
+
 }
 
 .slot{
+
 background:#fffaf2;
 padding:14px;
 border-radius:12px;
-cursor:pointer;
+
 }
 
 .available{
-border:2px solid #9bd39b;
+
+border:2px solid #8bd18b;
+cursor:pointer;
+
 }
 
 .reserved{
-border:2px solid #d88989;
+
+border:2px solid #d98c8c;
 background:#f7eaea;
+
 }
 
 .locked{
+
 border:2px solid #aaa;
 background:#eee;
-cursor:not-allowed;
+
 }
 
 .modal{
+
 display:none;
 position:fixed;
 top:0;
@@ -68,10 +116,11 @@ height:100%;
 background:rgba(0,0,0,0.4);
 align-items:center;
 justify-content:center;
-z-index:20;
+
 }
 
 .modalBox{
+
 background:white;
 padding:24px;
 border-radius:14px;
@@ -79,42 +128,25 @@ display:flex;
 flex-direction:column;
 gap:10px;
 width:260px;
+
 }
 
 .modalBox input{
+
 padding:10px;
 border-radius:8px;
 border:1px solid #ccc;
+
 }
 
 .modalBox button{
+
 padding:10px;
 border:none;
 border-radius:8px;
 background:#7da7ff;
 color:white;
 cursor:pointer;
-}
-
-.copyBox{
-
-display:none;
-
-position:fixed;
-
-bottom:80px;
-
-left:50%;
-
-transform:translateX(-50%);
-
-background:white;
-
-padding:15px;
-
-border-radius:10px;
-
-box-shadow:0 0 10px rgba(0,0,0,0.2);
 
 }
 
@@ -123,48 +155,42 @@ box-shadow:0 0 10px rgba(0,0,0,0.2);
 position:fixed;
 bottom:20px;
 right:20px;
-
 background:#6fa8ff;
 color:white;
-
 border:none;
 padding:12px 16px;
-
 border-radius:10px;
 cursor:pointer;
-
-z-index:40;
 
 }
 
 .adminPanel{
 
 display:none;
-
 position:fixed;
 top:50%;
 left:50%;
-
 transform:translate(-50%,-50%);
-
 background:white;
 padding:25px;
-
 border-radius:14px;
-
 box-shadow:0 0 20px rgba(0,0,0,0.25);
 
 }
 
 #adminControls{
+
 display:none;
+
 }
 
 #snow{
+
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
 pointer-events:none;
+
 }
