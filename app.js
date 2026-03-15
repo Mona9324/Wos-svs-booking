@@ -1,3 +1,31 @@
+const allianceColors={}
+
+const colorList=[
+"#9db4ff",
+"#ffb6b6",
+"#ffd6a5",
+"#caffbf",
+"#bdb2ff",
+"#ffc6ff"
+]
+
+function getAllianceColor(tag){
+
+if(!allianceColors[tag]){
+
+let color=getAllianceColor(data.alliance)
+
+div.innerHTML=`<b>${time} UTC</b>
+<br>${local} Local
+<br><span style="color:${color}">[${data.alliance}]</span> ${data.player}`
+
+}
+
+return allianceColors[tag]
+
+}
+
+
 let currentBuff="construction"
 
 const grid=document.getElementById("slots")
@@ -38,7 +66,16 @@ for(let m=0;m<60;m+=30){
 
 let time=
 String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")
+let utcDate = new Date()
+utcDate.setUTCHours(h)
+utcDate.setUTCMinutes(m)
 
+let local = utcDate.toLocaleTimeString([],{
+hour:'2-digit',
+minute:'2-digit'
+})
+
+  
 let id=currentBuff+"_"+time
 
 let div=document.createElement("div")
@@ -51,7 +88,7 @@ if(!data){
 
 div.className="slot available"
 
-div.innerHTML=`<b>${time}</b><br>Available`
+div.innerHTML=`<b>${time} UTC</b><br>${local} Local<br>Available`
 
 div.onclick=()=>openModal(id)
 
@@ -59,7 +96,7 @@ div.onclick=()=>openModal(id)
 
 div.className="slot reserved"
 
-div.innerHTML=`<b>${time}</b><br>[${data.alliance}] ${data.player}`
+div.innerHTML=`<b>${time} UTC</b><br>${local} Local<br>[${data.alliance}] ${data.player}`
 
 div.onclick=()=>cancelSlot(id,data.password)
 
