@@ -150,7 +150,7 @@ function confirmBooking(){
 let alliance=document.getElementById("alliance").value
 let player=document.getElementById("player").value
 let password=document.getElementById("password").value
-let days=parseInt(document.getElementById("daysSaved").value)
+let days=parseInt(document.getElementById("Speed-up").value)
 
 let required=getMinDaysRequired()
 
