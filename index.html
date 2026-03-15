@@ -24,15 +24,13 @@
 <div id="countdown"></div>
 
 </header>
-<div class="adminTop">
 
-<button onclick="toggleLock()">
-🔒 Toggle Booking
-</button>
+<div class="adminButton">
+
+<button onclick="openAdmin()">⚙ Admin</button>
 
 </div>
 
-  
 <div class="tabs">
 
 <button onclick="switchBuff('monday')">
@@ -79,9 +77,15 @@ Thursday (Training)
 
 </div>
 
-<div id="adminPanel">
+<div id="adminPanel" class="adminPanel">
 
-<button onclick="adminLogin()">Admin Panel</button>
+<h3>Admin Dashboard</h3>
+
+<button onclick="toggleBooking()">Toggle Booking</button>
+
+<button onclick="clearAll()">Clear All Slots</button>
+
+<button onclick="closeAdmin()">Close</button>
 
 </div>
 
