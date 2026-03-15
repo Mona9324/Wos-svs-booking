@@ -67,9 +67,14 @@ grid.innerHTML=""
 for(let h=0;h<24;h++){
 for(let m=0;m<60;m+=30){
 
-let time=String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")
+let utcTime=String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")
 
-let id=currentBuff+"_"+time
+let localDate=new Date()
+localDate.setUTCHours(h,m)
+
+let localTime=localDate.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
+
+let id=currentBuff+"_"+utcTime
 
 let div=document.createElement("div")
 
@@ -78,12 +83,15 @@ let slot=data[id]
 if(!bookingOpen){
 
 div.className="slot locked"
-div.innerHTML="<b>"+time+"</b><br>🔒 Locked"
+div.innerHTML="<b>"+utcTime+" UTC</b><br>"+localTime+"<br>🔒"
 
 }else if(!slot){
 
 div.className="slot available"
-div.innerHTML="<b>"+time+"</b><br>Available"
+
+div.innerHTML=
+"<b>"+utcTime+" UTC</b><br>"+
+localTime+"<br>Available"
 
 div.onclick=()=>openModal(id)
 
@@ -91,9 +99,11 @@ div.onclick=()=>openModal(id)
 
 div.className="slot reserved"
 
-div.innerHTML="<b>"+time+"</b><br>"+slot.alliance+" - "+slot.player
-
-div.title="Alliance: "+slot.alliance+"\nPlayer: "+slot.player
+div.innerHTML=
+"<b>"+utcTime+" UTC</b><br>"+
+localTime+"<br><br>"+
+slot.alliance+" - "+slot.player+
+"<br>"+slot.days+" days"
 
 }
 
@@ -132,65 +142,23 @@ document.getElementById("modal").style.display="none"
 
 }
 
-function getMinDaysRequired(){
-
-let now=new Date()
-let diff=(svsDate-now)/(1000*60*60*24)
-
-if(diff<=1) return 0
-if(diff<=2) return 15
-if(diff<=3) return 30
-
-return 30
-
-}
-
 function confirmBooking(){
 
 let alliance=document.getElementById("alliance").value
 let player=document.getElementById("player").value
 let password=document.getElementById("password").value
-let days=parseInt(document.getElementById("Speed-up").value)
-
-let required=getMinDaysRequired()
-
-if(days<required){
-
-alert("You need "+required+" days saved")
-
-return
-
-}
-
-let slotName=selectedSlot.split("_")[1]
-
-let text=
-slotName+" UTC\n"+
-alliance+" - "+player
-
-document.getElementById("copyText").innerText=text
-
-document.getElementById("copyBox").style.display="block"
+let days=document.getElementById("daysSaved").value
 
 db.collection("slots").doc(selectedSlot).set({
 
 alliance,
 player,
-password
+password,
+days
 
 })
 
 closeModal()
-
-}
-
-function copyDiscord(){
-
-let text=document.getElementById("copyText").innerText
-
-navigator.clipboard.writeText(text)
-
-alert("Copied for Discord")
 
 }
 
@@ -212,7 +180,7 @@ let pass=document.getElementById("adminPass").value
 
 if(pass!==ADMIN_PASSWORD){
 
-alert("Wrong password")
+alert("비밀번호 틀림")
 return
 
 }
@@ -227,7 +195,7 @@ document.getElementById("adminControls").style.display="block"
 function setBooking(state){
 
 if(!adminAuthenticated){
-alert("Admin login required")
+alert("관리자 로그인 필요")
 return
 }
 
@@ -240,11 +208,11 @@ open:state
 function clearAll(){
 
 if(!adminAuthenticated){
-alert("Admin login required")
+alert("관리자 로그인 필요")
 return
 }
 
-if(!confirm("Delete ALL bookings?")) return
+if(!confirm("모든 예약 삭제?")) return
 
 db.collection("slots").get().then(snapshot=>{
 
@@ -255,3 +223,74 @@ doc.ref.delete()
 })
 
 }
+
+const canvas=document.getElementById("snow")
+const ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+let snowflakes=[]
+
+for(let i=0;i<80;i++){
+
+snowflakes.push({
+
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*3+1,
+d:Math.random()+1
+
+})
+
+}
+
+function drawSnow(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+ctx.fillStyle="white"
+
+ctx.beginPath()
+
+for(let i=0;i<snowflakes.length;i++){
+
+let f=snowflakes[i]
+
+ctx.moveTo(f.x,f.y)
+ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true)
+
+}
+
+ctx.fill()
+
+moveSnow()
+
+}
+
+function moveSnow(){
+
+for(let i=0;i<snowflakes.length;i++){
+
+let f=snowflakes[i]
+
+f.y+=Math.pow(f.d,2)+1
+
+if(f.y>canvas.height){
+
+snowflakes[i]={
+
+x:Math.random()*canvas.width,
+y:0,
+r:f.r,
+d:f.d
+
+}
+
+}
+
+}
+
+}
+
+setInterval(drawSnow,33)
