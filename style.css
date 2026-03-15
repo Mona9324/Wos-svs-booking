@@ -74,3 +74,27 @@ grid-template-columns:1fr 1fr;
 }
 
 }
+
+.slotStats{
+margin:10px;
+font-size:14px;
+}
+
+.availableDot{
+display:inline-block;
+width:10px;
+height:10px;
+background:#7bbf7b;
+border-radius:50%;
+margin-right:4px;
+}
+
+.reservedDot{
+display:inline-block;
+width:10px;
+height:10px;
+background:#d37a7a;
+border-radius:50%;
+margin-left:12px;
+margin-right:4px;
+}
