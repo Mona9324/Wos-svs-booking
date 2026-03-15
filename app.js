@@ -73,6 +73,14 @@ db.collection("slots").doc(id).onSnapshot(doc=>{
 
 let data=doc.data()
 
+if(bookingLocked){
+
+div.className="slot locked"
+div.innerHTML="<b>"+time+" UTC</b><br>🔒 Booking Locked"
+
+}
+else if(locked){
+  
 if(locked){
 
 div.className="slot locked"
