@@ -2,7 +2,7 @@ let currentBuff="construction"
 
 const grid=document.getElementById("slots")
 
-const svsDate=new Date("2026-03-23T00:00:00Z")
+const svsDate=new Date("2026-03-15T00:00:00Z")
 
 function countdown(){
 
