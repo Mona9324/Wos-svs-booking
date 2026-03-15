@@ -188,3 +188,23 @@ grid-template-columns:1fr 1fr;
 }
 
 }
+
+.adminTop{
+
+position:absolute;
+top:20px;
+right:20px;
+
+}
+
+.adminTop button{
+
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#444;
+color:white;
+cursor:pointer;
+font-size:13px;
+
+}
