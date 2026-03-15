@@ -141,35 +141,6 @@ db.collection("slots").doc(id).delete()
 
 }
 
-function updateStats(){
-
-db.collection("slots").onSnapshot(snapshot=>{
-
-let counts={}
-
-snapshot.forEach(doc=>{
-
-let data=doc.data()
-
-if(!counts[data.alliance]){
-counts[data.alliance]=0
-}
-
-counts[data.alliance]++
-
-})
-
-let html=""
-
-for(let a in counts){
-html+=a+" : "+counts[a]+" slots<br>"
-}
-
-document.getElementById("stats").innerHTML=html
-
-})
-
-}
 
 function updateCounts(){
 
