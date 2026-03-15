@@ -85,6 +85,16 @@ db.collection("slots").doc(id).onSnapshot(doc=>{
 
 let data=doc.data()
 
+let now=new Date()
+
+if(now<BOOKING_OPEN){
+
+div.className="slot"
+div.innerHTML="<b>"+time+" UTC</b><br>🔒 Locked"
+div.onclick=null
+
+}else if(!data){
+  
 if(!data){
 
 div.className="slot available"
