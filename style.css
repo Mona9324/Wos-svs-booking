@@ -1,58 +1,67 @@
 body{
 
 font-family:Arial;
-background:#F4F8FF;
+background:#f3f5f7;
 text-align:center;
-margin:0;
 
 }
 
-header{
+h1{
 
-padding:20px;
-
-}
-
-#countdown{
-
-font-size:18px;
-font-weight:bold;
-color:#7DA8FF;
+margin-top:30px;
 
 }
 
-.tabs{
+#grid{
 
-margin:15px;
-
-}
-
-button{
-
-padding:10px 15px;
-border:none;
-border-radius:20px;
-background:#7DA8FF;
-color:white;
-margin:4px;
-cursor:pointer;
-
-}
-
-.grid{
+margin-top:30px;
 
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-gap:10px;
-padding:20px;
+
+grid-template-columns:repeat(4,120px);
+
+gap:12px;
+
+justify-content:center;
 
 }
 
 .slot{
 
-background:white;
 padding:15px;
-border-radius:14px;
-box-shadow:0 5px 8px rgba(0,0,0,0.05);
+
+border-radius:10px;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:0.2s;
+
+}
+
+/* 예약 가능 */
+
+.available{
+
+background:#cfe5d4;
+
+color:#2f5d3a;
+
+}
+
+/* 예약됨 */
+
+.booked{
+
+background:#e6c5c5;
+
+color:#6b2d2d;
+
+}
+
+.slot:hover{
+
+transform:scale(1.05);
 
 }
