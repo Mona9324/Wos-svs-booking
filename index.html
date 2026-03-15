@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 <html>
+
 <head>
 
 <meta charset="UTF-8">
@@ -26,19 +27,18 @@
 
 <div class="tabs">
 
-<button onclick="switchBuff('Monday(construction)')">Construction</button> <button onclick="switchBuff('Tuesday(research)')">Research</button> <button onclick="switchBuff('Thursday (training)')">Training</button>
-  
+<button onclick="switchBuff('construction')">Construction</button> <button onclick="switchBuff('research')">Research</button> <button onclick="switchBuff('training')">Training</button>
+
 </div>
 
 <div class="slotStats">
 
-<span class="availableDot"></span> <span id="availableCount">0</span>
+<span class="availableDot"></span> <span id="availableCount">0</span> Available
 
-<span class="reservedDot"></span> <span id="reservedCount">0</span>
+<span class="reservedDot"></span> <span id="reservedCount">0</span> Reserved
 
 </div>
 
-  
 <div id="slots" class="grid"></div>
 
 <h2>Alliance Usage</h2>
@@ -53,11 +53,11 @@
 
 <input id="alliance" placeholder="Alliance">
 
-<input id="player" placeholder="Player">
+<input id="player" placeholder="Player Name">
 
-<input id="password" type="password" placeholder="Cancel password">
+<input id="password" type="password" placeholder="Cancel Password">
 
-<button onclick="confirmBooking()">Confirm</button>
+<button onclick="confirmBooking()">Confirm Reservation</button>
 
 <button onclick="closeModal()">Cancel</button>
 
