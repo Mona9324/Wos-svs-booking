@@ -22,7 +22,11 @@ color:#555;
 
 .tabs{
 
-margin:10px;
+margin:18px;
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:10px;
 
 }
 
@@ -32,21 +36,11 @@ padding:14px 22px;
 margin:6px;
 border:none;
 border-radius:12px;
-background:#7fa7ff;
+background:#6d95f0;
 color:white;
 cursor:pointer;
 font-size:16px;
 font-weight:600;
-
-}
-
-.tabs{
-
-margin:18px;
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-gap:10px;
 
 }
 
@@ -92,6 +86,8 @@ padding:14px;
 border-radius:12px;
 cursor:pointer;
 font-size:14px;
+transform:scale(1.05);
+transition:0.15s;
 
 }
 
