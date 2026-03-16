@@ -1,9 +1,9 @@
 body {
+  margin: 0;
   font-family: Arial, sans-serif;
   background: #eef5fb;
-  margin: 0;
-  text-align: center;
   color: #1f2937;
+  text-align: center;
 }
 
 #snow {
@@ -15,46 +15,46 @@ body {
   z-index: 0;
 }
 
-header,
-.topWrap,
+.page-header,
+.top-wrap,
 .grid,
-.adminFloating,
-.adminPanel,
+.admin-floating,
+.admin-panel,
 .modal {
   position: relative;
   z-index: 1;
 }
 
-header {
+.page-header {
   padding: 20px 16px 10px;
 }
 
-h1 {
+.page-header h1 {
   margin: 0 0 10px;
 }
 
 #countdown {
+  margin-bottom: 14px;
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 14px;
 }
 
 #rankingBox {
-  margin: 0 auto;
   max-width: 320px;
-  background: rgba(255, 255, 255, 0.95);
+  margin: 0 auto;
   padding: 10px 12px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
-  text-align: left;
 }
 
-.rankingTitle {
-  font-weight: 700;
+.ranking-title {
   margin-bottom: 8px;
+  font-weight: 700;
 }
 
-.rankingItem {
+.ranking-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -62,12 +62,12 @@ h1 {
   font-size: 14px;
 }
 
-.rankingItem span {
-  font-weight: 700;
+.ranking-item span {
   min-width: 18px;
+  font-weight: 700;
 }
 
-.topWrap {
+.top-wrap {
   max-width: 920px;
   margin: 0 auto;
   padding: 0 20px;
@@ -82,7 +82,7 @@ h1 {
   margin: 18px auto 12px;
 }
 
-.tabs button {
+.tab-button {
   padding: 14px 10px;
   border: none;
   border-radius: 12px;
@@ -93,72 +93,67 @@ h1 {
   transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
-.tabs button:hover {
+.tab-button:hover {
   background: #ccecff;
 }
 
-.tabs button.active {
+.tab-button.active {
   background: #bfe7fb;
   color: #1c4a61;
 }
 
-.slotStats {
+.slot-stats {
   max-width: 920px;
   margin: 0 auto 6px;
   font-size: 18px;
   text-align: left;
 }
 
-.availableDot,
-.reservedDot {
+.available-dot,
+.reserved-dot {
+  display: inline-block;
   width: 10px;
   height: 10px;
-  display: inline-block;
+  margin-right: 6px;
   border-radius: 50%;
   vertical-align: middle;
-  margin-right: 6px;
 }
 
-.availableDot {
+.available-dot {
   background: #8bd18b;
 }
 
-.reservedDot {
-  background: #d98c8c;
+.reserved-dot {
   margin-left: 20px;
+  background: #d98c8c;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
-  padding: 20px;
   max-width: 920px;
   margin: 0 auto 30px;
+  padding: 20px;
   box-sizing: border-box;
 }
 
 .slot {
-  background: #fffaf2;
-  border-radius: 12px;
-  text-align: left;
-  min-height: 128px;
-  padding: 12px;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-height: 128px;
+  padding: 12px;
+  box-sizing: border-box;
+  text-align: left;
+  background: #fffaf2;
+  border-radius: 12px;
   transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
 .slot.available {
   border: 2px solid #8bd18b;
   cursor: pointer;
-}
-
-.slot.available:hover,
-.slot.reserved:hover {
-  transform: translateY(-1px);
 }
 
 .slot.reserved {
@@ -172,49 +167,54 @@ h1 {
   background: #ececec;
 }
 
-.slot.selected.highlightAvailable {
+.slot.available:hover,
+.slot.reserved:hover {
+  transform: translateY(-1px);
+}
+
+.slot.selected.highlight-available {
   background-color: #e9f8e9;
 }
 
-.slot.selected.highlightReserved {
+.slot.selected.highlight-reserved {
   background-color: #f4dfdf;
 }
 
-.timeRow {
+.time-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
 }
 
-.timeUTC {
-  font-weight: 700;
+.time-utc {
   font-size: 15px;
+  font-weight: 700;
 }
 
-.timeLocal {
+.time-local {
+  margin-top: 6px;
   font-size: 13px;
   color: #5b6470;
-  margin-top: 6px;
 }
 
-.statusAvailable {
+.status-available {
+  font-size: 13px;
+  font-weight: 700;
   color: #3f9b3f;
-  font-weight: 700;
-  font-size: 13px;
   white-space: nowrap;
 }
 
-.statusReserved {
+.status-reserved {
+  font-size: 13px;
+  font-weight: 700;
   color: #c95555;
-  font-weight: 700;
-  font-size: 13px;
   white-space: nowrap;
 }
 
-.bookingInfo {
-  font-size: 14px;
+.booking-info {
   margin-top: 10px;
+  font-size: 14px;
   line-height: 1.35;
   word-break: break-word;
 }
@@ -223,9 +223,9 @@ h1 {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
   padding: 16px;
   box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.35);
   z-index: 1000;
 }
 
@@ -235,103 +235,98 @@ h1 {
   justify-content: center;
 }
 
-.modalBox {
-  background: #fff;
-  width: 100%;
-  max-width: 320px;
-  padding: 24px;
-  border-radius: 14px;
+.modal-box {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  padding: 24px;
   box-sizing: border-box;
+  background: #fff;
+  border-radius: 14px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
 }
 
-.modalBox h3 {
+.modal-box h3 {
   margin: 0 0 4px;
 }
 
-.modalBox input {
+.modal-box input,
+.admin-login input {
   padding: 10px 12px;
   border: 1px solid #cfd8e3;
   border-radius: 8px;
   font-size: 14px;
 }
 
-.modalButtons {
+.modal-buttons {
   display: flex;
   gap: 8px;
   margin-top: 4px;
 }
 
-.modalButtons button {
+.modal-buttons button {
   flex: 1;
 }
 
-.modalButtons button,
-.adminPanel button,
-.adminFloating {
+.modal-buttons button,
+.admin-panel button,
+.admin-floating {
   padding: 10px 12px;
   border: none;
   border-radius: 8px;
   background: #7da7ff;
-  color: white;
+  color: #fff;
   font-weight: 700;
   cursor: pointer;
 }
 
-.modalButtons button:hover,
-.adminPanel button:hover,
-.adminFloating:hover {
+.modal-buttons button:hover,
+.admin-panel button:hover,
+.admin-floating:hover {
   background: #6a96f4;
 }
 
-.adminFloating {
+.admin-floating {
   position: fixed;
-  bottom: 20px;
   right: 20px;
+  bottom: 20px;
   z-index: 900;
 }
 
-.adminPanel {
+.admin-panel {
   display: none;
   position: fixed;
   top: 50%;
   left: 50%;
   width: calc(100% - 32px);
   max-width: 340px;
-  transform: translate(-50%, -50%);
-  background: #fff;
   padding: 22px;
+  box-sizing: border-box;
+  background: #fff;
   border-radius: 14px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.22);
+  transform: translate(-50%, -50%);
   z-index: 1001;
-  box-sizing: border-box;
 }
 
-.adminPanel.show {
+.admin-panel.show {
   display: block;
 }
 
-.adminPanel h3 {
+.admin-panel h3 {
   margin-top: 0;
 }
 
-#adminLogin,
-#adminControls {
+.admin-login,
+.admin-controls {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-#adminLogin input {
-  padding: 10px 12px;
-  border: 1px solid #cfd8e3;
-  border-radius: 8px;
-}
-
-#adminControls {
+.admin-controls {
   display: none;
   margin-bottom: 12px;
 }
@@ -351,7 +346,7 @@ h1 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .slotStats {
+  .slot-stats {
     text-align: center;
     line-height: 1.8;
   }
