@@ -1,38 +1,38 @@
-let currentBuff="monday";
-let selectedSlot=null;
-const ADMIN_PASSWORD="2737admin";
-let adminAuthenticated=false;
-let bookingOpen=false;
-const svsDate=new Date("2026-03-23T00:00:00Z");
-const grid=document.getElementById("slots");
+let currentBuff = "monday";
+let selectedSlot = null;
+const ADMIN_PASSWORD = "2737admin";
+let adminAuthenticated = false;
+let bookingOpen = false;
+const svsDate = new Date("2026-03-23T00:00:00Z");
+const grid = document.getElementById("slots");
 
 // Countdown
-function updateCountdown(){
-    let now=new Date();
-    let diff=svsDate-now;
-    let d=Math.floor(diff/(1000*60*60*24));
-    let h=Math.floor((diff/(1000*60*60))%24);
-    let m=Math.floor((diff/(1000*60))%60);
-    document.getElementById("countdown").innerHTML="SVS begins in "+d+"d "+h+"h "+m+"m";
+function updateCountdown() {
+    let now = new Date();
+    let diff = svsDate - now;
+    let d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    let h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    let m = Math.floor((diff / (1000 * 60)) % 60);
+    document.getElementById("countdown").innerHTML = "SVS begins in " + d + "d " + h + "h " + m + "m";
 }
-setInterval(updateCountdown,60000);
+setInterval(updateCountdown, 60000);
 updateCountdown();
 
 // Tabs
-function switchBuff(buff){
-    currentBuff=buff;
-    document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+function switchBuff(buff) {
+    currentBuff = buff;
+    document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
     event.target.classList.add("active");
     loadSlots();
 }
 
 // Load Slots
-function loadSlots(){
-    db.collection("settings").doc("booking").onSnapshot(doc=>{
+function loadSlots() {
+    db.collection("settings").doc("booking").onSnapshot(doc => {
         bookingOpen = doc.exists ? doc.data().open : false;
-        db.collection("slots").onSnapshot(snapshot=>{
-            let data={};
-            snapshot.forEach(doc=>{data[doc.id]=doc.data();});
+        db.collection("slots").onSnapshot(snapshot => {
+            let data = {};
+            snapshot.forEach(doc => { data[doc.id] = doc.data(); });
             generateSlots(data);
             updateCounts(data);
             updateTopSpeedups(data);
@@ -40,125 +40,76 @@ function loadSlots(){
     });
 }
 
-function generateSlots(data){
-    grid.innerHTML="";
-    for(let h=0;h<24;h++){
-        for(let m=0;m<60;m+=30){
-            let utcTime=String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
-            let localDate=new Date();
-            localDate.setUTCHours(h,m);
-            let localTime=localDate.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-            let id=currentBuff+"_"+utcTime;
-            let div=document.createElement("div"); div.id=id;
-            let slot=data[id];
+// Helper: Pad time
+function padTime(h, m) {
+    if (m >= 60) { h++; m -= 60; }
+    h %= 24;
+    return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+}
 
-            if(!bookingOpen){
-                div.className="slot locked";
-                div.innerHTML=`<b>${utcTime} - ${padTime(h,m+30)} UTC</b><br>${localTime}<br>🔒`;
-            }else if(!slot){
-                div.className="slot available";
-                div.innerHTML=`<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h,m+30)} UTC</span><span class='statusAvailable'>Available</span></div><div class='timeLocal'>${localTime}</div>`;
-                div.onclick=()=>slotClicked(id,'available');
-            }else{
-                div.className="slot reserved";
-                div.innerHTML=`<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h,m+30)} UTC</span><span class='statusReserved'>Reserved</span></div>
-                <div class='timeLocal'>${localTime}</div>
-                <div class='bookingInfo'>[${slot.alliance}] ${slot.player} (${slot.days})</div>`;
-                div.onclick=()=>slotClicked(id,'reserved',slot);
+// Generate Slots
+function generateSlots(data) {
+    grid.innerHTML = "";
+    for (let h = 0; h < 24; h++) {
+        for (let m = 0; m < 60; m += 30) {
+            let utcTime = String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+            let localDate = new Date();
+            localDate.setUTCHours(h, m);
+            let localTime = localDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            let id = currentBuff + "_" + utcTime;
+            let div = document.createElement("div");
+            div.id = id;
+
+            let slot = data[id];
+
+            if (!bookingOpen) {
+                div.className = "slot locked";
+                div.innerHTML = `<b>${utcTime} - ${padTime(h, m + 30)} UTC</b><br>${localTime}<br>🔒`;
+            } else if (!slot) {
+                div.className = "slot available";
+                div.innerHTML = `<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h, m + 30)} UTC</span><span class='statusAvailable'>Available</span></div><div class='timeLocal'>${localTime}</div>`;
+                div.onclick = () => highlightSlot(div, 'available');
+            } else {
+                div.className = "slot reserved";
+                div.innerHTML = `<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h, m + 30)} UTC</span><span class='statusReserved'>Reserved</span></div><div class='timeLocal'>${localTime}</div>
+                <div class='bookingInfo'>${slot.alliance || ""} ${slot.player || ""}</div>`;
+                div.onclick = () => highlightSlot(div, 'reserved');
             }
             grid.appendChild(div);
         }
     }
 }
 
-function padTime(h,m){if(m>=60){h+=1;m-=60;}if(h>=24) h-=24;return String(h).padStart(2,'0')+":"+String(m).padStart(2,'0');}
-
-// Slot click
-function slotClicked(slotId,type,slotData=null){
-    document.querySelectorAll('.slot').forEach(el=>el.classList.remove('selected','highlightAvailable','highlightReserved'));
-    const div=document.getElementById(slotId); 
-    if(type==='available') div.classList.add('highlightAvailable');
-    else if(type==='reserved') div.classList.add('highlightReserved');
-    if(type==='available') openModal(slotId);
-    else if(type==='reserved') openCancelModal(slotId,slotData);
+// Highlight slot on click
+function highlightSlot(div, type) {
+    document.querySelectorAll(".slot").forEach(s => s.classList.remove("selected", "highlightAvailable", "highlightReserved"));
+    div.classList.add("selected", type === "available" ? "highlightAvailable" : "highlightReserved");
+    selectedSlot = div.id;
 }
 
-// Booking modal
-function openModal(id){selectedSlot=id;document.getElementById("modal").style.display="flex";}
-function closeModal(){document.getElementById("modal").style.display="none";}
-function confirmBooking(){
-    let alliance=document.getElementById("alliance").value;
-    let player=document.getElementById("player").value;
-    let password=document.getElementById("password").value;
-    let days=parseInt(document.getElementById("daysSaved").value) || 0;
-    db.collection("slots").doc(selectedSlot).set({alliance,player,password,days});
-    closeModal();
+// Update Available/Reserved counts
+function updateCounts(data) {
+    let available = 0, reserved = 0;
+    for (let k in data) {
+        if (k.startsWith(currentBuff)) reserved++; else available++;
+    }
+    document.getElementById("availableCount").innerText = "Available " + available;
+    document.getElementById("reservedCount").innerText = "Reserved " + reserved;
 }
 
-// Cancel modal
-let cancelSlot=null; let cancelData=null;
-function openCancelModal(id,data){cancelSlot=id;cancelData=data;document.getElementById("cancelModal").style.display="flex";}
-function closeCancelModal(){document.getElementById("cancelModal").style.display="none";}
-function confirmCancel(){
-    let inputPass=document.getElementById("cancelPassword").value;
-    if(inputPass===cancelData.password){db.collection("slots").doc(cancelSlot).delete();closeCancelModal();}
-    else alert("Password incorrect");
+// Update Top Speed-ups
+function updateTopSpeedups(data) {
+    const rankingBox = document.getElementById("rankingBox");
+    rankingBox.innerHTML = "";
+    let allSlots = Object.values(data).filter(s => s && s.daysSaved);
+    allSlots.sort((a, b) => b.daysSaved - a.daysSaved);
+    allSlots.slice(0, 6).forEach((s, idx) => {
+        let div = document.createElement("div");
+        div.className = "rankingItem";
+        if (idx < 3) div.innerHTML = `<span>${idx+1}</span> ${s.player || ""} (${s.daysSaved})`;
+        else div.innerHTML = `<span>${idx+1}</span> ${s.player || ""} (${s.daysSaved})`;
+        rankingBox.appendChild(div);
+    });
 }
 
-// Admin
-function openAdmin(){document.getElementById("adminPanel").style.display="block";}
-function closeAdmin(){document.getElementById("adminPanel").style.display="none";}
-function adminLogin(){
-    let pass=document.getElementById("adminPass").value;
-    if(pass!==ADMIN_PASSWORD){alert("비밀번호 틀림"); return;}
-    adminAuthenticated=true;
-    document.getElementById("adminLogin").style.display="none";
-    document.getElementById("adminControls").style.display="block";
-}
-function setBooking(state){
-    if(!adminAuthenticated){alert("관리자 로그인 필요");return;}
-    db.collection("settings").doc("booking").set({open:state});
-}
-function clearAll(){
-    if(!adminAuthenticated){alert("관리자 로그인 필요");return;}
-    if(!confirm("모든 예약 삭제?")) return;
-    db.collection("slots").get().then(snapshot=>{snapshot.forEach(doc=>doc.ref.delete());});
-}
-
-// Counts
-function updateCounts(data){
-    let reserved=0;
-    for(let key in data) if(key.startsWith(currentBuff)) reserved++;
-    let total=48;
-    document.getElementById("reservedCount").innerText="Reserved "+reserved;
-    document.getElementById("availableCount").innerText="Available "+(total-reserved);
-}
-
-// Top Speed-ups with animation
-let previousTop=[];
-function updateTopSpeedups(data){
-    let players=[];
-    for(let key in data){ let p=data[key]; players.push({alliance:p.alliance,name:p.player,speed:p.days}); }
-    players.sort((a,b)=>b.speed-a.speed);
-    let top6 = players.slice(0,6);
-    const box=document.getElementById('rankingBox'); if(!box) return;
-    // Animate change
-    let html='<b>Top Speed-ups</b><div style="display:flex; justify-content:center; gap:40px; margin-top:4px;">'+
-        '<div style="display:flex; flex-direction:column; gap:2px;">'+
-        top6.slice(0,3).map((p,i)=>{const trophies=['🥇','🥈','🥉']; return `<div class="rankAnim">${trophies[i]} [${p.alliance}] ${p.name} (${p.speed})</div>`;}).join('')+'</div>'+
-        '<div style="display:flex; flex-direction:column; gap:2px;">'+
-        top6.slice(3,6).map((p,i)=>{const colors=['#a0d8f0','#90c8e0','#80b8d0']; return `<div class="rankAnim" style="display:inline-block;background:${colors[i]};border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;">${i+4}</div> [${p.alliance}] ${p.name} (${p.speed})</div>`;}).join('')+'</div>'+
-        '</div>';
-    box.innerHTML=html;
-}
-
-// Snow
-const canvas=document.getElementById("snow"); const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth; canvas.height=window.innerHeight;
-let snowflakes=[]; for(let i=0;i<80;i++){ snowflakes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+1,d:Math.random()+1});}
-function drawSnow(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="#a0d8ff";ctx.beginPath();for(let i=0;i<snowflakes.length;i++){let f=snowflakes[i];ctx.moveTo(f.x,f.y);ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true);}ctx.fill();moveSnow();}
-function moveSnow(){for(let i=0;i<snowflakes.length;i++){let f=snowflakes[i];f.y+=Math.pow(f.d,2)+1;if(f.y>canvas.height){snowflakes[i]={x:Math.random()*canvas.width,y:0,r:f.r,d:f.d};}}}
-setInterval(drawSnow,33);
-
-// Default Monday
-document.querySelectorAll(".tabs button")[0].classList.add("active");
+loadSlots();
