@@ -1,10 +1,10 @@
 let currentBuff="monday"
 let selectedSlot=null
+let cancelSlot=null
 
 const ADMIN_PASSWORD="2737admin"
 
 let adminAuthenticated=false
-let bookingOpen=true
 
 const grid=document.getElementById("slots")
 
@@ -85,6 +85,8 @@ div.innerHTML=
 "<div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>"+
 "<div class='bookingInfo'>["+slot.alliance+"] "+slot.player+" ("+slot.days+")</div>"
 
+div.onclick=()=>openCancelModal(id)
+
 }
 
 grid.appendChild(div)
@@ -138,6 +140,35 @@ days
 })
 
 closeModal()
+
+}
+
+/* CANCEL SYSTEM */
+
+function openCancelModal(id){
+
+cancelSlot=id
+
+let pass=prompt("Enter your cancel password")
+
+if(pass==null) return
+
+db.collection("slots").doc(id).get().then(doc=>{
+
+if(!doc.exists) return
+
+let data=doc.data()
+
+if(pass!==data.password){
+alert("Wrong password")
+return
+}
+
+if(confirm("Cancel this reservation?")){
+db.collection("slots").doc(id).delete()
+}
+
+})
 
 }
 
