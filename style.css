@@ -5,8 +5,12 @@ margin:0;
 text-align:center;
 }
 
+/* HEADER */
+
 header{
 padding:20px;
+position:relative;
+z-index:2;
 }
 
 #utcClock{
@@ -18,6 +22,8 @@ font-weight:bold;
 margin-top:4px;
 color:#555;
 }
+
+/* TABS */
 
 .tabs{
 margin:20px auto;
@@ -38,6 +44,8 @@ font-weight:bold;
 cursor:pointer;
 font-size:15px;
 }
+
+/* SLOT STATS */
 
 .slotStats{
 margin-top:10px;
@@ -64,18 +72,7 @@ margin-left:20px;
 margin-right:6px;
 }
 
-#rankingBox{
-max-width:600px;
-margin:10px auto;
-background:white;
-padding:10px;
-border-radius:12px;
-}
-
-#ranking{
-text-align:left;
-font-size:14px;
-}
+/* GRID */
 
 .grid{
 display:grid;
@@ -84,13 +81,15 @@ gap:16px;
 padding:20px;
 max-width:1100px;
 margin:auto;
+position:relative;
+z-index:2;
 }
 
 .slot{
 background:#ffffff;
-padding:12px 16px;
+padding:10px 14px;
 border-radius:12px;
-min-height:80px;
+min-height:70px;
 text-align:left;
 }
 
@@ -109,6 +108,8 @@ border:2px solid #aaa;
 background:#eee;
 }
 
+/* TIME */
+
 .timeRow{
 display:flex;
 justify-content:space-between;
@@ -117,7 +118,7 @@ align-items:center;
 
 .timeUTC{
 font-weight:bold;
-font-size:15px;
+font-size:14px;
 }
 
 .statusAvailable{
@@ -149,6 +150,8 @@ font-size:12px;
 margin-top:6px;
 }
 
+/* MODAL */
+
 .modal{
 display:none;
 position:fixed;
@@ -159,6 +162,7 @@ height:100%;
 background:rgba(0,0,0,0.4);
 align-items:center;
 justify-content:center;
+z-index:10000;
 }
 
 .modalBox{
@@ -186,6 +190,8 @@ color:white;
 cursor:pointer;
 }
 
+/* ADMIN BUTTON */
+
 .adminFloating{
 position:fixed;
 bottom:20px;
@@ -196,8 +202,10 @@ border:none;
 padding:12px 16px;
 border-radius:10px;
 cursor:pointer;
-z-index:9999;
+z-index:20000;
 }
+
+/* ADMIN PANEL */
 
 .adminPanel{
 display:none;
@@ -209,14 +217,14 @@ background:white;
 padding:25px;
 border-radius:14px;
 box-shadow:0 0 20px rgba(0,0,0,0.25);
-z-index:9999;
+z-index:20000;
 }
 
 #adminControls{
 display:none;
 }
 
-/* snow canvas */
+/* SNOW */
 
 #snow{
 position:fixed;
@@ -225,5 +233,5 @@ left:0;
 width:100%;
 height:100%;
 pointer-events:none;
-z-index:0;
+z-index:1;
 }
