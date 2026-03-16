@@ -536,3 +536,30 @@ h1 {
   filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.45));
 }
 }
+
+/* top creator image */
+.creatorBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.creatorAvatar {
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #d6b347;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  display: block;
+}
+
+.creatorCredit {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #7a6a52;
+  text-align: center;
+}
