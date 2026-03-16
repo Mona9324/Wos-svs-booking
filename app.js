@@ -31,8 +31,6 @@ function updateCountdown() {
 
   document.getElementById("countdown").innerText = `SVS begins in ${d}d ${h}h ${m}m`;
 }
-setInterval(updateCountdown, 60000);
-updateCountdown();
 
 function padTime(h, m) {
   if (m >= 60) {
@@ -45,19 +43,19 @@ function padTime(h, m) {
 
 function clearSelection() {
   document.querySelectorAll(".slot").forEach((slot) => {
-    slot.classList.remove("selected", "highlightAvailable", "highlightReserved");
+    slot.classList.remove("selected", "highlight-available", "highlight-reserved");
   });
 }
 
 function highlightSlot(div, isAvailable) {
   clearSelection();
   div.classList.add("selected");
-  div.classList.add(isAvailable ? "highlightAvailable" : "highlightReserved");
+  div.classList.add(isAvailable ? "highlight-available" : "highlight-reserved");
 }
 
 function switchBuff(buff) {
   currentBuff = buff;
-  document.querySelectorAll(".tabs button").forEach((btn) => btn.classList.remove("active"));
+  document.querySelectorAll(".tab-button").forEach((btn) => btn.classList.remove("active"));
   const tab = document.getElementById(`tab-${buff}`);
   if (tab) tab.classList.add("active");
   loadSlots();
@@ -146,8 +144,11 @@ function updateCounts(data) {
   for (let h = 0; h < 24; h++) {
     for (let m = 0; m < 60; m += 30) {
       const id = `${currentBuff}_${padTime(h, m)}`;
-      if (data[id]) reserved++;
-      else available++;
+      if (data[id]) {
+        reserved++;
+      } else {
+        available++;
+      }
     }
   }
 
@@ -161,13 +162,13 @@ function updateTopSpeedups(data) {
     .sort((a, b) => Number(b.daysSaved) - Number(a.daysSaved))
     .slice(0, 6);
 
-  let html = `<div class="rankingTitle">Top Speed-ups</div>`;
+  let html = '<div class="ranking-title">Top Speed-ups</div>';
 
   if (allSlots.length === 0) {
-    html += `<div class="rankingItem">No data yet</div>`;
+    html += '<div class="ranking-item">No data yet</div>';
   } else {
     allSlots.forEach((slot, idx) => {
-      html += `<div class="rankingItem"><span>${idx + 1}</span> ${slot.player || "-"} (${slot.daysSaved})</div>`;
+      html += `<div class="ranking-item"><span>${idx + 1}</span> ${slot.player || "-"} (${slot.daysSaved})</div>`;
     });
   }
 
@@ -196,21 +197,21 @@ function generateSlots(data) {
       if (!bookingOpen) {
         div.classList.add("locked");
         div.innerHTML = `
-          <div class="timeRow">
-            <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
+          <div class="time-row">
+            <span class="time-utc">${utcTime} - ${padTime(h, m + 30)} UTC</span>
           </div>
-          <div class="timeLocal">${localTime}</div>
-          <div class="bookingInfo">🔒 Booking Closed</div>
+          <div class="time-local">${localTime}</div>
+          <div class="booking-info">🔒 Booking Closed</div>
         `;
       } else if (!slot) {
         div.classList.add("available");
         div.innerHTML = `
-          <div class="timeRow">
-            <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
-            <span class="statusAvailable">Available</span>
+          <div class="time-row">
+            <span class="time-utc">${utcTime} - ${padTime(h, m + 30)} UTC</span>
+            <span class="status-available">Available</span>
           </div>
-          <div class="timeLocal">${localTime}</div>
-          <div class="bookingInfo">&nbsp;</div>
+          <div class="time-local">${localTime}</div>
+          <div class="booking-info">&nbsp;</div>
         `;
         div.addEventListener("click", () => {
           highlightSlot(div, true);
@@ -219,12 +220,12 @@ function generateSlots(data) {
       } else {
         div.classList.add("reserved");
         div.innerHTML = `
-          <div class="timeRow">
-            <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
-            <span class="statusReserved">Reserved</span>
+          <div class="time-row">
+            <span class="time-utc">${utcTime} - ${padTime(h, m + 30)} UTC</span>
+            <span class="status-reserved">Reserved</span>
           </div>
-          <div class="timeLocal">${localTime}</div>
-          <div class="bookingInfo">[${slot.alliance}] ${slot.player} (${slot.daysSaved})</div>
+          <div class="time-local">${localTime}</div>
+          <div class="booking-info">[${slot.alliance}] ${slot.player} (${slot.daysSaved})</div>
         `;
         div.addEventListener("click", () => {
           highlightSlot(div, false);
@@ -242,6 +243,7 @@ function attachRealtimeListeners() {
     slotsUnsubscribe();
     slotsUnsubscribe = null;
   }
+
   if (bookingUnsubscribe) {
     bookingUnsubscribe();
     bookingUnsubscribe = null;
@@ -249,9 +251,11 @@ function attachRealtimeListeners() {
 
   bookingUnsubscribe = dbRef.collection("settings").doc("booking").onSnapshot(
     (doc) => {
-      bookingOpen = doc.exists ? !!doc.data().open : false;
+      bookingOpen = doc.exists ? Boolean(doc.data().open) : false;
 
-      if (slotsUnsubscribe) slotsUnsubscribe();
+      if (slotsUnsubscribe) {
+        slotsUnsubscribe();
+      }
 
       slotsUnsubscribe = dbRef.collection("slots").onSnapshot(
         (snapshot) => {
@@ -374,14 +378,13 @@ function drawSnow() {
       f.y = -5;
       f.x = Math.random() * canvas.width;
     }
+
     if (f.x < -5) f.x = canvas.width + 5;
     if (f.x > canvas.width + 5) f.x = -5;
   });
 
   requestAnimationFrame(drawSnow);
 }
-
-window.addEventListener("resize", resizeCanvas);
 
 document.getElementById("tab-monday").addEventListener("click", () => switchBuff("monday"));
 document.getElementById("tab-tuesday").addEventListener("click", () => switchBuff("tuesday"));
@@ -399,6 +402,10 @@ document.getElementById("openBookingBtn").addEventListener("click", () => setBoo
 document.getElementById("closeBookingBtn").addEventListener("click", () => setBooking(false));
 document.getElementById("clearAllBtn").addEventListener("click", clearAll);
 
+window.addEventListener("resize", resizeCanvas);
+setInterval(updateCountdown, 60000);
+
+updateCountdown();
 initSnow();
 drawSnow();
 loadSlots();
