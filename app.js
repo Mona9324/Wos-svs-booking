@@ -1,21 +1,16 @@
 let currentBuff="monday";
 let selectedSlot=null;
 let cancelSlot=null;
-
 const ADMIN_PASSWORD="2737admin";
 const grid=document.getElementById("slots");
 const svsDate=new Date("2026-03-23T00:00:00Z");
-const bookingOpenTime=new Date("2026-03-20T00:00:00Z");
 let bookingOpen=false;
 
-// ==================== COUNTDOWN ====================
+// ==================== SVS COUNTDOWN ====================
 function updateCountdown(){
     let now=new Date();
     let diff=svsDate-now;
-    if(diff<0){
-        document.getElementById("countdown").innerText="SVS has started!";
-        return;
-    }
+    if(diff<0){document.getElementById("countdown").innerText="SVS has started!"; return;}
     let d=Math.floor(diff/(1000*60*60*24));
     let h=Math.floor((diff/(1000*60*60))%24);
     let m=Math.floor((diff/(1000*60))%60);
@@ -24,30 +19,26 @@ function updateCountdown(){
 setInterval(updateCountdown,60000);
 updateCountdown();
 
-// ==================== BOOKING TIMER ====================
-function updateOpenTimer(){
-    let now=new Date();
-    if(now>=bookingOpenTime){
-        bookingOpen=true;
-        db.collection("settings").doc("booking").set({open:true});
-        return;
+// ==================== FIRESTORE SETTINGS LISTENER ====================
+db.collection("settings").doc("booking").onSnapshot(doc=>{
+    if(doc.exists){
+        bookingOpen=doc.data().open;
+        loadSlots();
     }
-}
-setInterval(updateOpenTimer,60000);
-updateOpenTimer();
+});
 
-// ==================== LOAD & SWITCH BUFF ====================
+// ==================== LOAD SLOTS ====================
 function loadSlots(){
     db.collection("slots").onSnapshot(snapshot=>{
         let data={};
-        snapshot.forEach(doc=>data[doc.id]=doc.data());
+        snapshot.forEach(doc=>{data[doc.id]=doc.data()});
         generateSlots(data);
         updateCounts(data);
         updateRanking(data);
     });
 }
-loadSlots();
 
+// ==================== SWITCH BUFF ====================
 function switchBuff(buff){
     currentBuff=buff;
     document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
@@ -55,7 +46,7 @@ function switchBuff(buff){
     loadSlots();
 }
 
-// ==================== SLOT GENERATION ====================
+// ==================== GENERATE SLOTS ====================
 function generateSlots(data){
     grid.innerHTML="";
     for(let h=0;h<24;h++){
@@ -74,24 +65,16 @@ function generateSlots(data){
 
             if(!bookingOpen){
                 div.className="slot locked";
-                div.innerHTML=
-                "<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusReserved'>Locked</div></div>"+
-                "<div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>";
+                div.innerHTML="<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusReserved'>Locked</div></div><div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>";
             } else if(!slot){
                 div.className="slot available";
-                div.innerHTML=
-                "<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusAvailable'>Available</div></div>"+
-                "<div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>";
+                div.innerHTML="<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusAvailable'>Available</div></div><div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>";
                 div.onclick=()=>{openModal(id); highlightSlot(div);}
-            } else {
+            } else{
                 div.className="slot reserved";
-                div.innerHTML=
-                "<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusReserved'>Reserved</div></div>"+
-                "<div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>"+
-                "<div class='bookingInfo'>["+slot.alliance+"] "+slot.player+" ("+slot.days+")</div>";
+                div.innerHTML="<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusReserved'>Reserved</div></div><div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div><div class='bookingInfo'>["+slot.alliance+"] "+slot.player+" ("+slot.days+")</div>";
                 div.onclick=()=>{openCancelModal(id); highlightSlot(div);}
             }
-
             grid.appendChild(div);
         }
     }
@@ -107,13 +90,12 @@ function updateCounts(data){
     let reserved=0;
     for(let key in data){ if(key.startsWith(currentBuff)) reserved++; }
     let total=48;
-    let r=document.getElementById("reservedCount");
-    let a=document.getElementById("availableCount");
+    let r=document.getElementById("reservedCount"); let a=document.getElementById("availableCount");
     if(r) r.innerText="Reserved "+reserved;
     if(a) a.innerText="Available "+(total-reserved);
 }
 
-// ==================== SPEED-UP RANKING ====================
+// ==================== TOP SPEED-UPS ====================
 function updateRanking(data){
     let list=[];
     for(let key in data){
@@ -123,15 +105,19 @@ function updateRanking(data){
         if(!isNaN(days)) list.push({alliance:slot.alliance,player:slot.player,days:days});
     }
     list.sort((a,b)=>b.days-a.days);
-    let html="";
-    for(let i=0;i<list.length&&i<5;i++){
+    let leftHTML="", rightHTML="";
+    for(let i=0;i<list.length&&i<6;i++){
         let p=list[i];
-        if(i==0) html+="<span style='font-size:22px'>🥇</span> ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
-        else if(i==1) html+="<span style='font-size:20px'>🥈</span> ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
-        else if(i==2) html+="<span style='font-size:18px'>🥉</span> ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
-        else html+="<span style='display:inline-block;width:20px;height:20px;border-radius:50%;background:#a0e7ff;color:white;text-align:center;font-size:12px;margin-right:4px;'>"+(i+1)+"</span> ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
+        let medal="";
+        if(i==0) medal="🥇";
+        else if(i==1) medal="🥈";
+        else if(i==2) medal="🥉";
+        else medal="<span style='display:inline-block;width:20px;height:20px;border-radius:50%;background:#a0e7ff;color:white;text-align:center;font-size:12px;margin-right:2px;'>"+(i+1)+"</span>";
+        if(i<3) leftHTML+=medal+" ["+p.alliance+"] "+p.player+" ("+p.days+")<br>";
+        else rightHTML+=medal+" ["+p.alliance+"] "+p.player+" ("+p.days+")<br>";
     }
-    let el=document.getElementById("ranking"); if(el) el.innerHTML=html;
+    let el=document.getElementById("ranking");
+    if(el) el.innerHTML="<div style='float:left'>"+leftHTML+"</div><div style='float:right'>"+rightHTML+"</div>";
 }
 
 // ==================== BOOKING ====================
