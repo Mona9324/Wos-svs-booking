@@ -1,180 +1,129 @@
-let currentBuff = "monday";
-let selectedSlot = null;
-let cancelSlot = null;
-
-const ADMIN_PASSWORD = "2737admin";
-const grid = document.getElementById("slots");
-
-// SVS 시작일
-const svsDate = new Date("2026-03-23T00:00:00Z");
-
-// 예약 오픈 시간
-const bookingOpenTime = new Date("2026-03-20T00:00:00Z");
-
-let bookingOpen = false; // firebase와 sync
+let currentBuff="monday";
+let selectedSlot=null;
+let cancelSlot=null;
+const ADMIN_PASSWORD="2737admin";
+const grid=document.getElementById("slots");
+const svsDate=new Date("2026-03-23T00:00:00Z");
+const bookingOpenTime=new Date("2026-03-20T00:00:00Z");
+let bookingOpen=false;
 
 // ==================== COUNTDOWN ====================
-function updateCountdown() {
-    let now = new Date();
-    let diff = svsDate - now;
-
-    if(diff < 0){
-        document.getElementById("countdown").innerText = "SVS has started!";
-        return;
-    }
-
-    let d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    let h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    let m = Math.floor((diff / (1000 * 60)) % 60);
-
-    document.getElementById("countdown").innerText =
-        "SVS begins in " + d + "d " + h + "h " + m + "m";
+function updateCountdown(){
+    let now=new Date();
+    let diff=svsDate-now;
+    if(diff<0){document.getElementById("countdown").innerText="SVS has started!"; return;}
+    let d=Math.floor(diff/(1000*60*60*24));
+    let h=Math.floor((diff/(1000*60*60))%24);
+    let m=Math.floor((diff/(1000*60))%60);
+    document.getElementById("countdown").innerText="SVS begins in "+d+"d "+h+"h "+m+"m";
 }
-
-setInterval(updateCountdown, 60000);
+setInterval(updateCountdown,60000);
 updateCountdown();
 
 // ==================== BOOKING TIMER ====================
-function updateOpenTimer() {
-    let now = new Date();
-    if(now >= bookingOpenTime){
-        bookingOpen = true;
-        db.collection("settings").doc("booking").set({ open: true });
-        document.getElementById("openTimer").innerText = "Booking is OPEN";
+function updateOpenTimer(){
+    let now=new Date();
+    if(now>=bookingOpenTime){
+        bookingOpen=true;
+        db.collection("settings").doc("booking").set({open:true});
         return;
     }
-    let diff = bookingOpenTime - now;
-    let h = Math.floor(diff / 1000 / 60 / 60);
-    let m = Math.floor(diff / 1000 / 60) % 60;
-    document.getElementById("openTimer").innerText = "Booking opens in " + h + "h " + m + "m";
+    let diff=bookingOpenTime-now;
+    let h=Math.floor(diff/1000/60/60);
+    let m=Math.floor(diff/1000/60)%60;
 }
-setInterval(updateOpenTimer, 60000);
+setInterval(updateOpenTimer,60000);
 updateOpenTimer();
-
-// ==================== FIREBASE ====================
-db.collection("settings").doc("booking").onSnapshot(doc => {
-    if(doc.exists){
-        bookingOpen = doc.data().open;
-    }
-    loadSlots();
-});
 
 // ==================== LOAD & SWITCH BUFF ====================
 function loadSlots(){
-    db.collection("slots").onSnapshot(snapshot => {
-        let data = {};
-        snapshot.forEach(doc => { data[doc.id] = doc.data(); });
+    db.collection("slots").onSnapshot(snapshot=>{
+        let data={};
+        snapshot.forEach(doc=>data[doc.id]=doc.data());
         generateSlots(data);
         updateCounts(data);
         updateRanking(data);
     });
 }
 loadSlots();
-
 function switchBuff(buff){
-    currentBuff = buff;
+    currentBuff=buff;
+    document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+    document.querySelector(`.tabs button[onclick="switchBuff('${buff}')"]`).classList.add("active");
     loadSlots();
 }
 
 // ==================== SLOT GENERATION ====================
 function generateSlots(data){
-    grid.innerHTML = "";
-    for(let h=0; h<24; h++){
-        for(let m=0; m<60; m+=30){
-            let startUTC = String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
-            let endM = m+30;
-            let endH = h;
-            if(endM == 60){ endM = 0; endH++; }
-            let endUTC = String(endH).padStart(2,"0")+":"+String(endM).padStart(2,"0");
-
-            let localStart = new Date(); localStart.setUTCHours(h,m);
-            let localEnd = new Date(); localEnd.setUTCHours(endH,endM);
-            let localStartStr = localStart.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-            let localEndStr = localEnd.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-
-            let id = currentBuff+"_"+startUTC;
-            let div = document.createElement("div");
-            let slot = data[id];
-
-            if(!bookingOpen){
-                div.className = "slot locked";
-                div.innerHTML =
-                "<div class='timeRow'>"+
-                "<div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div>"+
-                "<div class='statusReserved'>Locked</div>"+
-                "</div>"+
-                "<div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>";
-            }
+    grid.innerHTML="";
+    for(let h=0;h<24;h++){
+        for(let m=0;m<60;m+=30){
+            let startUTC=String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
+            let endM=m+30,endH=h;if(endM==60){endM=0;endH++;}
+            let endUTC=String(endH).padStart(2,"0")+":"+String(endM).padStart(2,"0");
+            let localStart=new Date(); localStart.setUTCHours(h,m);
+            let localEnd=new Date(); localEnd.setUTCHours(endH,endM);
+            let localStartStr=localStart.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+            let localEndStr=localEnd.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+            let id=currentBuff+"_"+startUTC;
+            let div=document.createElement("div");
+            let slot=data[id];
+            div.classList.remove("selected");
+            if(!bookingOpen){div.className="slot locked";div.innerHTML="<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusReserved'>Locked</div></div><div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>";}
             else if(!slot){
-                div.className = "slot available";
-                div.innerHTML =
-                "<div class='timeRow'>"+
-                "<div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div>"+
-                "<div class='statusAvailable'>Available</div>"+
-                "</div>"+
-                "<div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>";
-                div.onclick = ()=>openModal(id);
+                div.className="slot available";
+                div.innerHTML="<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusAvailable'>Available</div></div><div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>";
+                div.onclick=()=>{openModal(id); highlightSlot(div);}
             }
             else{
-                div.className = "slot reserved";
-                div.innerHTML =
-                "<div class='timeRow'>"+
-                "<div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div>"+
-                "<div class='statusReserved'>Reserved</div>"+
-                "</div>"+
-                "<div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div>"+
-                "<div class='bookingInfo'>["+slot.alliance+"] "+slot.player+" ("+slot.days+")</div>";
-                div.onclick = ()=>openCancelModal(id);
+                div.className="slot reserved";
+                div.innerHTML="<div class='timeRow'><div class='timeUTC'>"+startUTC+" - "+endUTC+" UTC</div><div class='statusReserved'>Reserved</div></div><div class='timeLocal'>"+localStartStr+" - "+localEndStr+"</div><div class='bookingInfo'>["+slot.alliance+"] "+slot.player+" ("+slot.days+")</div>";
+                div.onclick=()=>{openCancelModal(id); highlightSlot(div);}
             }
-
             grid.appendChild(div);
         }
     }
 }
 
+function highlightSlot(div){
+    document.querySelectorAll(".slot").forEach(s=>s.classList.remove("selected"));
+    div.classList.add("selected");
+}
+
 // ==================== COUNTS ====================
 function updateCounts(data){
-    let reserved = 0;
-    for(let key in data){
-        if(key.startsWith(currentBuff)) reserved++;
-    }
-    let total = 48;
-    let r = document.getElementById("reservedCount");
-    let a = document.getElementById("availableCount");
-    if(r) r.innerText = "Reserved "+reserved;
-    if(a) a.innerText = "Available "+(total-reserved);
+    let reserved=0;
+    for(let key in data){ if(key.startsWith(currentBuff)) reserved++; }
+    let total=48;
+    let r=document.getElementById("reservedCount"); let a=document.getElementById("availableCount");
+    if(r) r.innerText="Reserved "+reserved;
+    if(a) a.innerText="Available "+(total-reserved);
 }
 
 // ==================== SPEED-UP RANKING ====================
 function updateRanking(data){
-    let list = [];
+    let list=[];
     for(let key in data){
         if(!key.startsWith(currentBuff)) continue;
-        let slot = data[key];
-        let days = parseInt(slot.days);
-        if(!isNaN(days)) list.push({alliance:slot.alliance, player:slot.player, days:days});
+        let slot=data[key];
+        let days=parseInt(slot.days);
+        if(!isNaN(days)) list.push({alliance:slot.alliance,player:slot.player,days:days});
     }
     list.sort((a,b)=>b.days-a.days);
-    let html = "";
-    for(let i=0;i<list.length && i<5;i++){
+    let html="";
+    for(let i=0;i<list.length&&i<5;i++){
         let p=list[i];
-        if(i==0) html += "🥇 ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
-        else if(i==1) html += "🥈 ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
-        else if(i==2) html += "🥉 ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
-        else html += "<div style='display:inline-block;width:20px;height:20px;border-radius:50%;background:#7da7ff;color:white;text-align:center;font-size:12px;margin-right:4px;'>"+(i+1)+"</div>["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
+        if(i==0) html+="<span style='font-size:20px'>🥇</span> ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
+        else if(i==1) html+="<span style='font-size:18px'>🥈</span> ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
+        else if(i==2) html+="<span style='font-size:16px'>🥉</span> ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
+        else html+="<span style='display:inline-block;width:20px;height:20px;border-radius:50%;background:#a0e7ff;color:white;text-align:center;font-size:12px;margin-right:4px;'>"+(i+1)+"</span> ["+p.alliance+"] "+p.player+" — "+p.days+"<br>";
     }
-    let el = document.getElementById("ranking");
-    if(el) el.innerHTML = html;
+    let el=document.getElementById("ranking"); if(el) el.innerHTML=html;
 }
 
 // ==================== BOOKING ====================
-function openModal(id){
-    selectedSlot=id;
-    document.getElementById("modal").style.display="flex";
-}
-function closeModal(){
-    document.getElementById("modal").style.display="none";
-}
+function openModal(id){selectedSlot=id; document.getElementById("modal").style.display="flex";}
+function closeModal(){document.getElementById("modal").style.display="none";}
 function confirmBooking(){
     let alliance=document.getElementById("alliance").value.toUpperCase();
     let player=document.getElementById("player").value;
@@ -186,17 +135,13 @@ function confirmBooking(){
 }
 
 // ==================== CANCEL ====================
-function openCancelModal(id){
-    cancelSlot=id;
-    document.getElementById("cancelPassword").value="";
-    document.getElementById("cancelModal").style.display="flex";
-}
+function openCancelModal(id){cancelSlot=id; document.getElementById("cancelPassword").value=""; document.getElementById("cancelModal").style.display="flex";}
 function closeCancelModal(){document.getElementById("cancelModal").style.display="none";}
 function confirmCancel(){
     let pass=document.getElementById("cancelPassword").value;
     db.collection("slots").doc(cancelSlot).get().then(doc=>{
         if(!doc.exists) return;
-        let data = doc.data();
+        let data=doc.data();
         if(pass!==data.password){alert("Wrong password"); return;}
         db.collection("slots").doc(cancelSlot).delete();
         closeCancelModal();
@@ -212,39 +157,16 @@ function adminLogin(){
     document.getElementById("adminLogin").style.display="none";
     document.getElementById("adminControls").style.display="block";
 }
-function setBooking(state){
-    db.collection("settings").doc("booking").set({open: state});
-}
-function clearAll(){
-    if(!confirm("모든 예약 삭제?")) return;
-    db.collection("slots").get().then(snapshot=>{snapshot.forEach(doc=>doc.ref.delete());});
-}
+function setBooking(state){db.collection("settings").doc("booking").set({open:state}); bookingOpen=state;}
+function clearAll(){if(!confirm("모든 예약 삭제?")) return; db.collection("slots").get().then(snapshot=>snapshot.forEach(doc=>doc.ref.delete()));}
 
 // ==================== SNOW ====================
 const canvas=document.getElementById("snow");
 const ctx=canvas.getContext("2d");
 function resizeSnow(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
-resizeSnow();
-window.addEventListener("resize",resizeSnow);
+resizeSnow(); window.addEventListener("resize",resizeSnow);
 let snowflakes=[];
 for(let i=0;i<100;i++){snowflakes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+1,d:Math.random()+1});}
-function drawSnow(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle="#cfe8ff";
-    ctx.beginPath();
-    for(let i=0;i<snowflakes.length;i++){
-        let f=snowflakes[i];
-        ctx.moveTo(f.x,f.y);
-        ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true);
-    }
-    ctx.fill();
-    moveSnow();
-}
-function moveSnow(){
-    for(let i=0;i<snowflakes.length;i++){
-        let f=snowflakes[i];
-        f.y+=Math.pow(f.d,2)+1;
-        if(f.y>canvas.height){snowflakes[i]={x:Math.random()*canvas.width,y:0,r:f.r,d:f.d};}
-    }
-}
+function drawSnow(){ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#cfe8ff"; ctx.beginPath(); for(let f of snowflakes){ctx.moveTo(f.x,f.y); ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true);} ctx.fill(); moveSnow();}
+function moveSnow(){for(let i=0;i<snowflakes.length;i++){let f=snowflakes[i]; f.y+=Math.pow(f.d,2)+1; if(f.y>canvas.height){snowflakes[i]={x:Math.random()*canvas.width,y:0,r:f.r,d:f.d};}}}
 setInterval(drawSnow,30);
