@@ -1,93 +1,148 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2737 SVS Booking</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2737 SVS Booking</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
 <body>
-  <canvas id="snow"></canvas>
+
+<canvas id="snow"></canvas>
 
 <header>
-  <div class="creatorBadge">
-    <img src="images/creator-dino.png" alt="Creator artwork" class="creatorAvatar">
-    <div class="creatorCredit">Mona</div>
-  </div>
 
-  <h1>❄ 2737 SVS Booking</h1>
-  <div id="countdown"></div>
-  <div id="rankingBox"></div>
+<div class="creatorBadge">
+<img src="creator-dino.png" class="creatorAvatar">
+<div class="creatorCredit">Illustration by ChatGPT</div>
+</div>
+
+<h1>❄ 2737 SVS Booking</h1>
+
+<div id="countdown"></div>
+
+<div id="rankingBox"></div>
+
 </header>
 
-  <section class="tabsWrap">
-    <div class="tabs">
-      <button type="button" id="tab-monday" onclick="switchBuff('monday')">Monday (Construction)</button>
-      <button type="button" id="tab-tuesday" onclick="switchBuff('tuesday')">Tuesday (Research)</button>
-      <button type="button" id="tab-thursday" onclick="switchBuff('thursday')">Thursday (Troop Training)</button>
-    </div>
 
-    <div class="slotStats">
-      <span class="availableDot"></span>
-      <span id="availableCount">Available 0</span>
-      <span class="reservedDot"></span>
-      <span id="reservedCount">Reserved 0</span>
-    </div>
-  </section>
+<section class="tabsWrap">
 
-  <main>
-    <div id="slots" class="grid"></div>
-  </main>
+<div class="tabs">
+<button id="tab-monday" onclick="switchBuff('monday')">Monday (Construction)</button>
+<button id="tab-tuesday" onclick="switchBuff('tuesday')">Tuesday (Research)</button>
+<button id="tab-thursday" onclick="switchBuff('thursday')">Thursday (Troop Training)</button>
+</div>
 
-  <!-- Reserve Modal -->
-  <div id="modal" class="modal">
-    <div class="modalBox">
-      <h3>Reserve Slot</h3>
-      <input id="alliance" type="text" placeholder="Alliance" autocomplete="off">
-      <input id="player" type="text" placeholder="Player Name" autocomplete="off">
-      <input id="daysSaved" type="number" placeholder="Use Speed-up" min="0">
-      <input id="password" type="password" placeholder="Cancel Password" autocomplete="new-password">
-      <button type="button" onclick="confirmBooking()">Reserve</button>
-      <button type="button" onclick="closeModal()">Cancel</button>
-    </div>
-  </div>
+<div class="slotStats">
+<span class="availableDot"></span>
+<span id="availableCount">Available 0</span>
 
-  <!-- Cancel Modal -->
-  <div id="cancelModal" class="modal">
-    <div class="modalBox">
-      <h3>Cancel Reservation</h3>
-      <input id="cancelPassword" type="password" placeholder="Password" autocomplete="current-password">
-      <button type="button" onclick="confirmCancel()">Cancel Reservation</button>
-      <button type="button" onclick="closeCancelModal()">Close</button>
-    </div>
-  </div>
+<span class="reservedDot"></span>
+<span id="reservedCount">Reserved 0</span>
+</div>
 
-  <!-- Admin Button -->
-  <button type="button" class="adminFloating" onclick="openAdmin()">⚙ Admin</button>
+</section>
 
-  <!-- Admin Popup -->
-  <div id="adminPanel" class="adminOverlay">
-    <div class="adminPanelBox">
-      <h3>관리자 패널</h3>
 
-      <div id="adminLogin">
-        <input id="adminPass" type="password" placeholder="관리자 비밀번호" autocomplete="current-password">
-        <button type="button" onclick="adminLogin()">로그인</button>
-      </div>
+<main>
+<div id="slots" class="grid"></div>
+</main>
 
-      <div id="adminControls" style="display:none;">
-        <button type="button" onclick="setBooking(true)">예약 열기</button>
-        <button type="button" onclick="setBooking(false)">예약 잠금</button>
-        <button type="button" onclick="clearAll()">전체 예약 삭제</button>
-      </div>
 
-      <button type="button" onclick="closeAdmin()">닫기</button>
-    </div>
-  </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <script src="firebase.js"></script>
-  <script src="app.js"></script>
+<!-- 예약 모달 -->
+
+<div id="modal" class="modal">
+
+<div class="modalBox">
+
+<h3>Reserve Slot</h3>
+
+<input id="alliance" type="text" placeholder="Alliance">
+
+<input id="player" type="text" placeholder="Player">
+
+<input id="daysSaved" type="number" placeholder="Use Speed-up">
+
+<input id="password" type="password" placeholder="Cancel Password">
+
+<button onclick="confirmBooking()">Reserve</button>
+
+<button onclick="closeModal()">Cancel</button>
+
+</div>
+
+</div>
+
+
+
+<!-- 예약 취소 모달 -->
+
+<div id="cancelModal" class="modal">
+
+<div class="modalBox">
+
+<h3>Cancel Reservation</h3>
+
+<input id="cancelPassword" type="password" placeholder="Password">
+
+<button onclick="confirmCancel()">Cancel Reservation</button>
+
+<button onclick="closeCancelModal()">Close</button>
+
+</div>
+
+</div>
+
+
+
+<!-- Admin 버튼 -->
+
+<button class="adminFloating" onclick="openAdmin()">⚙ Admin</button>
+
+
+
+<!-- Admin 패널 -->
+
+<div id="adminPanel" class="adminPanel">
+
+<h3>관리자 패널</h3>
+
+<div id="adminLogin">
+
+<input id="adminPass" type="password" placeholder="관리자 비밀번호">
+
+<button onclick="adminLogin()">로그인</button>
+
+</div>
+
+
+<div id="adminControls" style="display:none;">
+
+<button onclick="setBooking(true)">예약 열기</button>
+
+<button onclick="setBooking(false)">예약 잠금</button>
+
+<button onclick="clearAll()">전체 예약 삭제</button>
+
+</div>
+
+<button onclick="closeAdmin()">닫기</button>
+
+</div>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script src="firebase.js"></script>
+
+<script src="app.js"></script>
+
 </body>
 </html>
