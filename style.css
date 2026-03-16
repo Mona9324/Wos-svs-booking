@@ -1,40 +1,207 @@
-body { font-family: Arial; background: #eef5fb; margin: 0; text-align: center; }
-header { padding: 20px; position: relative; }
-.slotStats { margin: 10px 0; font-size: 18px; }
-.availableDot { width: 10px; height: 10px; background: #8bd18b; display: inline-block; border-radius: 50%; margin-right: 6px; }
-.reservedDot { width: 10px; height: 10px; background: #d98c8c; display: inline-block; border-radius: 50%; margin-left: 20px; margin-right: 6px; }
+body {
+    font-family: Arial;
+    background: #eef5fb;
+    margin: 0;
+    text-align: center;
+}
+header {
+    padding: 20px;
+    position: relative;
+}
+.slotStats {
+    margin: 10px 0;
+    font-size: 18px;
+}
+.availableDot {
+    width: 10px;
+    height: 10px;
+    background: #8bd18b;
+    display: inline-block;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+.reservedDot {
+    width: 10px;
+    height: 10px;
+    background: #d98c8c;
+    display: inline-block;
+    border-radius: 50%;
+    margin-left: 20px;
+    margin-right: 6px;
+}
 
-.tabs { display: flex; justify-content: center; margin: 20px 0; }
-.tabs button { flex: 1; padding: 14px; margin: 0 5px; border: none; border-radius: 12px; background: #7da7ff; color: white; font-weight: bold; cursor: pointer; }
-.tabs button.active { background: #5f85d6; }
+/* 탭 버튼 */
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+.tabs button {
+    flex: 1;
+    padding: 14px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 12px;
+    background: #7da7ff;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+.tabs button.active {
+    background: #5f85d6;
+}
 
-.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 20px; max-width: 900px; margin: auto; }
+/* 슬롯 그리드 */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+}
+.slot {
+    background: #fffaf2;
+    border-radius: 12px;
+    text-align: left;
+    transition: 0.3s;
+    min-height: 120px; /* 예약 전/후 동일 높이 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+}
+.slot.available {
+    border: 2px solid #8bd18b;
+    cursor: pointer;
+}
+.slot.reserved {
+    border: 2px solid #d98c8c;
+    background: #f7eaea;
+}
+.slot.locked {
+    border: 2px solid #aaa;
+    background: #eee;
+}
 
-.slot { background: #fffaf2; padding: 10px; border-radius: 12px; text-align: left; transition: 0.3s; min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
-.slot.available { border: 2px solid #8bd18b; cursor: pointer; }
-.slot.reserved { border: 2px solid #d98c8c; background: #f7eaea; }
-.slot.locked { border: 2px solid #aaa; background: #eee; }
+/* 클릭 하이라이트 */
+.slot.selected.highlightAvailable {
+    background-color: #e0f8e0; /* 연한 연두 */
+}
+.slot.selected.highlightReserved {
+    background-color: #f8e0e0; /* 연한 붉은색 */
+}
 
-.selected.highlightAvailable { background-color: #d6f5d6; }
-.selected.highlightReserved { background-color: #f5c2c2; }
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    align-items: center; justify-content: center;
+}
+.modalBox {
+    background: white;
+    padding: 24px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 280px;
+    margin: auto;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.modalBox input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+.modalBox button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #7da7ff;
+    color: white;
+    cursor: pointer;
+}
 
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
-.modalBox { background: white; padding: 24px; border-radius: 14px; display: flex; flex-direction: column; gap: 10px; width: 280px; margin: auto; position: relative; top: 50%; transform: translateY(-50%); }
-.modalBox input { padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
-.modalBox button { padding: 10px; border: none; border-radius: 8px; background: #7da7ff; color: white; cursor: pointer; }
+.adminFloating {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #6fa8ff;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.adminPanel {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.25);
+}
+#adminControls {
+    display: none;
+}
 
-.adminFloating { position: fixed; bottom: 20px; right: 20px; background: #6fa8ff; color: white; border: none; padding: 12px 16px; border-radius: 10px; cursor: pointer; }
-.adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 14px; box-shadow: 0 0 20px rgba(0,0,0,0.25); }
-#adminControls { display: none; }
-#snow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+#snow {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
 
-.bookingInfo { font-size: 0.9em; margin-top: 4px; }
-.timeRow { display: flex; justify-content: space-between; }
-.timeUTC { font-weight: bold; }
-.timeLocal { font-size: 0.85em; color: #555; }
-.statusAvailable { color: #4CAF50; font-weight: bold; margin-left: 5px; }
-.statusReserved { color: #F44336; font-weight: bold; margin-left: 5px; }
+.bookingInfo {
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+.timeRow {
+    display: flex;
+    justify-content: space-between;
+}
+.timeUTC {
+    font-weight: bold;
+}
+.timeLocal {
+    font-size: 0.85em;
+    color: #555;
+}
+.statusAvailable {
+    color: #4CAF50;
+    font-weight: bold;
+    margin-left: 5px;
+}
+.statusReserved {
+    color: #F44336;
+    font-weight: bold;
+    margin-left: 5px;
+}
 
-#rankingBox { position: absolute; top: 10px; right: 10px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 4px; }
-.rankingItem { display: flex; gap: 6px; align-items: center; }
-.rankingItem span { font-weight: bold; }
+#rankingBox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.rankingItem {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.rankingItem span {
+    font-weight: bold;
+}
