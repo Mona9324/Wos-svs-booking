@@ -6,7 +6,7 @@ let bookingOpen=false;
 const svsDate=new Date("2026-03-23T00:00:00Z");
 const grid=document.getElementById("slots");
 
-// ====== Countdown ======
+// Countdown
 function updateCountdown(){
     let now=new Date();
     let diff=svsDate-now;
@@ -19,7 +19,7 @@ function updateCountdown(){
 setInterval(updateCountdown,60000);
 updateCountdown();
 
-// ====== Load slots ======
+// Load slots
 db.collection("settings").doc("booking").onSnapshot(doc=>{
     if(doc.exists) bookingOpen=doc.data().open;
     loadSlots();
@@ -34,7 +34,7 @@ function loadSlots(){
     });
 }
 
-// ====== Tabs ======
+// Tabs
 function switchBuff(buff){
     currentBuff=buff;
     document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
@@ -42,7 +42,7 @@ function switchBuff(buff){
     loadSlots();
 }
 
-// ====== Slots ======
+// Slots
 function generateSlots(data){
     grid.innerHTML="";
     for(let h=0;h<24;h++){
@@ -60,20 +60,24 @@ function generateSlots(data){
                 div.innerHTML="<b>"+utcTime+" - "+padTime(h,m+30)+" UTC</b><br>"+localTime+"<br>🔒";
             }else if(!slot){
                 div.className="slot available";
-                div.innerHTML="<div class='timeRow'><span class='timeUTC'>"+utcTime+" - "+padTime(h,m+30)+" UTC</span><span class='statusAvailable'>Available</span></div><div class='timeLocal'>"+localTime+"</div>";
+                div.innerHTML=`<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h,m+30)} UTC</span><span class='statusAvailable'>Available</span></div><div class='timeLocal'>${localTime}</div>`;
                 div.onclick=()=>slotClicked(id,'available');
             }else{
                 div.className="slot reserved";
-                div.innerHTML="<div class='timeRow'><span class='timeUTC'>"+utcTime+" - "+padTime(h,m+30)+" UTC</span><span class='statusReserved'>Reserved</span></div><div class='timeLocal'>"+localTime+"</div><div class='bookingInfo'>"+slot.alliance+" - "+slot.player+" ("+slot.days+" days)</div>";
+                div.innerHTML=`<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h,m+30)} UTC</span><span class='statusReserved'>Reserved</span></div>
+                <div class='timeLocal'>${localTime}</div>
+                <div class='bookingInfo'>${slot.alliance} - ${slot.player} (${slot.days} days)</div>
+                <div class='rankingInfo'>Rank: ${slot.rank ? slot.rank : '-'}</div>`;
                 div.onclick=()=>slotClicked(id,'reserved',slot);
             }
             grid.appendChild(div);
         }
     }
 }
+
 function padTime(h,m){if(m>=60){h+=1;m-=60;}if(h>=24) h-=24;return String(h).padStart(2,'0')+":"+String(m).padStart(2,'0');}
 
-// ====== Slot click ======
+// Slot click
 function slotClicked(slotId,type,slotData=null){
     document.querySelectorAll('.slot').forEach(el=>el.classList.remove('selected'));
     const div=document.getElementById(slotId); div.classList.add('selected');
@@ -81,7 +85,7 @@ function slotClicked(slotId,type,slotData=null){
     else if(type==='reserved') openCancelModal(slotId,slotData);
 }
 
-// ====== Booking modal ======
+// Booking modal
 function openModal(id){selectedSlot=id;document.getElementById("modal").style.display="flex";}
 function closeModal(){document.getElementById("modal").style.display="none";}
 function confirmBooking(){
@@ -93,7 +97,7 @@ function confirmBooking(){
     closeModal();
 }
 
-// ====== Cancel modal ======
+// Cancel modal
 let cancelSlot=null; let cancelData=null;
 function openCancelModal(id,data){cancelSlot=id;cancelData=data;document.getElementById("cancelModal").style.display="flex";}
 function closeCancelModal(){document.getElementById("cancelModal").style.display="none";}
@@ -103,7 +107,7 @@ function confirmCancel(){
     else alert("Password incorrect");
 }
 
-// ====== Admin ======
+// Admin
 function openAdmin(){document.getElementById("adminPanel").style.display="block";}
 function closeAdmin(){document.getElementById("adminPanel").style.display="none";}
 function adminLogin(){
@@ -123,7 +127,7 @@ function clearAll(){
     db.collection("slots").get().then(snapshot=>{snapshot.forEach(doc=>doc.ref.delete());});
 }
 
-// ====== Counts ======
+// Counts
 function updateCounts(data){
     let reserved=0;
     for(let key in data) if(key.startsWith(currentBuff)) reserved++;
@@ -132,7 +136,7 @@ function updateCounts(data){
     document.getElementById("availableCount").innerText="Available "+(total-reserved);
 }
 
-// ====== Top Speed-ups ======
+// Top Speed-ups
 function loadSpeedups(){
     db.collection("speedups").orderBy("speed","desc").limit(6).onSnapshot(snapshot=>{
         const data=[]; snapshot.forEach(doc=>data.push(doc.data())); updateRanking(data);
@@ -147,7 +151,7 @@ function updateRanking(speedups){
 }
 loadSpeedups();
 
-// ====== Snow ======
+// Snow
 const canvas=document.getElementById("snow"); const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth; canvas.height=window.innerHeight;
 let snowflakes=[]; for(let i=0;i<80;i++){ snowflakes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*3+1,d:Math.random()+1});}
@@ -155,5 +159,5 @@ function drawSnow(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=
 function moveSnow(){for(let i=0;i<snowflakes.length;i++){let f=snowflakes[i];f.y+=Math.pow(f.d,2)+1;if(f.y>canvas.height){snowflakes[i]={x:Math.random()*canvas.width,y:0,r:f.r,d:f.d};}}}
 setInterval(drawSnow,33);
 
-// ====== Default Monday ======
+// Default Monday
 document.querySelectorAll(".tabs button")[0].classList.add("active");
