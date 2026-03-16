@@ -210,14 +210,14 @@ h1 {
 }
 
 .timeUTC {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.1px;
   white-space: nowrap;
 }
 
 .timeLocal {
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: 13px;
   color: #5b6470;
 }
