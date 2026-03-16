@@ -1,6 +1,6 @@
 let currentBuff = "monday";
 let selectedSlot = null;
-const ADMIN_PASSWORD = "2737admin";
+const ADMIN_PASSWORD = "2737admin"; // 임시용. 실제 운영은 프론트에 두면 안 됨.
 let adminAuthenticated = false;
 let bookingOpen = false;
 const svsDate = new Date("2026-03-23T00:00:00Z");
@@ -60,10 +60,15 @@ function highlightSlot(div, isAvailable) {
 function switchBuff(buff) {
   currentBuff = buff;
   setActiveTab();
+  // 리스너를 다시 붙일 필요 없이 현재 받아둔 전체 데이터로 다시 그림
   loadSlots();
 }
 
 function openReserveModal(id) {
+  if (!bookingOpen) {
+    alert("예약이 닫혀 있습니다.");
+    return;
+  }
   selectedSlot = id;
   document.getElementById("modal").classList.add("show");
 }
@@ -74,6 +79,7 @@ function closeModal() {
   document.getElementById("player").value = "";
   document.getElementById("daysSaved").value = "";
   document.getElementById("password").value = "";
+  selectedSlot = null;
   clearSelection();
 }
 
@@ -85,6 +91,7 @@ function openCancelModal(id) {
 function closeCancelModal() {
   document.getElementById("cancelModal").classList.remove("show");
   document.getElementById("cancelPassword").value = "";
+  selectedSlot = null;
   clearSelection();
 }
 
@@ -139,6 +146,16 @@ function clearAll() {
     });
 }
 
+function getCurrentBuffData(data) {
+  const filtered = {};
+  Object.keys(data).forEach((key) => {
+    if (key.startsWith(`${currentBuff}_`)) {
+      filtered[key] = data[key];
+    }
+  });
+  return filtered;
+}
+
 function updateCounts(data) {
   let reserved = 0;
   let available = 0;
@@ -156,22 +173,31 @@ function updateCounts(data) {
 }
 
 function updateTopSpeedups(data) {
-  const allSlots = Object.values(data)
+  const currentData = Object.values(getCurrentBuffData(data))
     .filter((slot) => slot && slot.daysSaved !== undefined && slot.daysSaved !== null && slot.daysSaved !== "")
     .sort((a, b) => Number(b.daysSaved) - Number(a.daysSaved))
     .slice(0, 6);
 
   let html = '<div class="rankingTitle">Top Speed-ups</div>';
 
-  if (allSlots.length === 0) {
+  if (currentData.length === 0) {
     html += '<div class="rankingItem">No data yet</div>';
   } else {
-    allSlots.forEach((slot, idx) => {
-      html += `<div class="rankingItem"><span>${idx + 1}</span> ${slot.player || "-"} (${slot.daysSaved})</div>`;
+    currentData.forEach((slot, idx) => {
+      html += `<div class="rankingItem"><span>${idx + 1}</span> ${escapeHtml(slot.player || "-")} (${Number(slot.daysSaved)})</div>`;
     });
   }
 
   document.getElementById("rankingBox").innerHTML = html;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function generateSlots(data) {
@@ -185,7 +211,14 @@ function generateSlots(data) {
 
       const localDate = new Date();
       localDate.setUTCHours(h, m, 0, 0);
-      const localTime = localDate.toLocaleTimeString([], {
+      const localEndDate = new Date(localDate.getTime() + 30 * 60 * 1000);
+
+      const localStart = localDate.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      const localEnd = localEndDate.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit"
       });
@@ -199,7 +232,7 @@ function generateSlots(data) {
           <div class="timeRow">
             <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
           </div>
-          <div class="timeLocal">${localTime}</div>
+          <div class="timeLocal">${localStart} - ${localEnd}</div>
           <div class="bookingInfo">🔒 Booking Closed</div>
         `;
       } else if (!slot) {
@@ -209,7 +242,7 @@ function generateSlots(data) {
             <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
             <span class="statusAvailable">Available</span>
           </div>
-          <div class="timeLocal">${localTime}</div>
+          <div class="timeLocal">${localStart} - ${localEnd}</div>
           <div class="bookingInfo">&nbsp;</div>
         `;
         div.onclick = () => {
@@ -223,8 +256,8 @@ function generateSlots(data) {
             <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
             <span class="statusReserved">Reserved</span>
           </div>
-          <div class="timeLocal">${localTime}</div>
-          <div class="bookingInfo">[${slot.alliance}] ${slot.player} (${slot.daysSaved})</div>
+          <div class="timeLocal">${localStart} - ${localEnd}</div>
+          <div class="bookingInfo">[${escapeHtml(slot.alliance)}] ${escapeHtml(slot.player)} (${Number(slot.daysSaved)})</div>
         `;
         div.onclick = () => {
           highlightSlot(div, false);
@@ -235,6 +268,12 @@ function generateSlots(data) {
       grid.appendChild(div);
     }
   }
+}
+
+function renderAll(data) {
+  generateSlots(data);
+  updateCounts(data);
+  updateTopSpeedups(data);
 }
 
 function attachRealtimeListeners() {
@@ -252,7 +291,10 @@ function attachRealtimeListeners() {
     (doc) => {
       bookingOpen = doc.exists ? Boolean(doc.data().open) : false;
 
-      if (slotsUnsubscribe) slotsUnsubscribe();
+      if (slotsUnsubscribe) {
+        slotsUnsubscribe();
+        slotsUnsubscribe = null;
+      }
 
       slotsUnsubscribe = dbRef.collection("slots").onSnapshot(
         (snapshot) => {
@@ -260,10 +302,7 @@ function attachRealtimeListeners() {
           snapshot.forEach((docItem) => {
             data[docItem.id] = docItem.data();
           });
-
-          generateSlots(data);
-          updateCounts(data);
-          updateTopSpeedups(data);
+          renderAll(data);
         },
         (error) => {
           console.error("slots onSnapshot error:", error);
@@ -277,34 +316,76 @@ function attachRealtimeListeners() {
 }
 
 function loadSlots() {
+  // 최초 1회는 리스너 연결, 그 이후 탭 전환이면 DOM만 다시 그리도록 바꾸고 싶으면
+  // 전역 캐시를 둘 수 있음.
+  // 지금은 기존 구조 유지.
   attachRealtimeListeners();
 }
 
 function confirmBooking() {
   if (!selectedSlot) return;
 
+  if (!bookingOpen) {
+    alert("예약이 닫혀 있습니다.");
+    return;
+  }
+
   const alliance = document.getElementById("alliance").value.trim();
   const player = document.getElementById("player").value.trim();
-  const daysSaved = document.getElementById("daysSaved").value.trim();
+  const daysSavedRaw = document.getElementById("daysSaved").value.trim();
   const password = document.getElementById("password").value;
 
-  if (!alliance || !player || !daysSaved || !password) {
+  if (!alliance || !player || !daysSavedRaw || !password) {
     alert("모든 항목을 입력해주세요.");
     return;
   }
 
-  dbRef.collection("slots").doc(selectedSlot).set({
-    alliance,
-    player,
-    daysSaved: Number(daysSaved),
-    password
+  const daysSaved = Number(daysSavedRaw);
+  if (Number.isNaN(daysSaved) || daysSaved < 0) {
+    alert("Days Saved 값을 올바르게 입력해주세요.");
+    return;
+  }
+
+  const slotRef = dbRef.collection("slots").doc(selectedSlot);
+  const bookingRef = dbRef.collection("settings").doc("booking");
+
+  dbRef.runTransaction(async (transaction) => {
+    const [bookingDoc, slotDoc] = await Promise.all([
+      transaction.get(bookingRef),
+      transaction.get(slotRef)
+    ]);
+
+    const isOpen = bookingDoc.exists ? Boolean(bookingDoc.data().open) : false;
+    if (!isOpen) {
+      throw new Error("BOOKING_CLOSED");
+    }
+
+    if (slotDoc.exists) {
+      throw new Error("ALREADY_RESERVED");
+    }
+
+    transaction.set(slotRef, {
+      alliance,
+      player,
+      daysSaved,
+      password,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      buff: currentBuff
+    });
   })
     .then(() => {
       closeModal();
     })
     .catch((error) => {
       console.error(error);
-      alert("예약 중 오류가 발생했습니다.");
+
+      if (error.message === "BOOKING_CLOSED") {
+        alert("예약이 닫혀 있습니다.");
+      } else if (error.message === "ALREADY_RESERVED") {
+        alert("이미 예약된 슬롯입니다.");
+      } else {
+        alert("예약 중 오류가 발생했습니다.");
+      }
     });
 }
 
@@ -312,26 +393,35 @@ function confirmCancel() {
   if (!selectedSlot) return;
 
   const cancelPassword = document.getElementById("cancelPassword").value;
+  const slotRef = dbRef.collection("slots").doc(selectedSlot);
 
-  dbRef.collection("slots").doc(selectedSlot).get()
-    .then((doc) => {
-      if (!doc.exists) {
-        alert("예약 정보를 찾을 수 없습니다.");
-        return;
-      }
+  dbRef.runTransaction(async (transaction) => {
+    const doc = await transaction.get(slotRef);
 
-      if (doc.data().password !== cancelPassword) {
-        alert("Password incorrect");
-        return;
-      }
+    if (!doc.exists) {
+      throw new Error("NOT_FOUND");
+    }
 
-      return dbRef.collection("slots").doc(selectedSlot).delete().then(() => {
-        closeCancelModal();
-      });
+    const data = doc.data();
+    if (data.password !== cancelPassword) {
+      throw new Error("WRONG_PASSWORD");
+    }
+
+    transaction.delete(slotRef);
+  })
+    .then(() => {
+      closeCancelModal();
     })
     .catch((error) => {
       console.error(error);
-      alert("취소 중 오류가 발생했습니다.");
+
+      if (error.message === "NOT_FOUND") {
+        alert("예약 정보를 찾을 수 없습니다.");
+      } else if (error.message === "WRONG_PASSWORD") {
+        alert("Password incorrect");
+      } else {
+        alert("취소 중 오류가 발생했습니다.");
+      }
     });
 }
 
