@@ -1,1 +1,4 @@
-
+<div class="creatorImageWrap">
+  <img src="creator-dino.png" alt="Creator artwork" class="creatorAvatar">
+  <button type="button" id="marshmallowSecret" aria-label="Admin secret"></button>
+</div>
