@@ -25,15 +25,6 @@ db.collection("settings").doc("booking").onSnapshot(doc=>{
     loadSlots();
 });
 
-function loadSlots(){
-    db.collection("slots").onSnapshot(snapshot=>{
-        let data={};
-        snapshot.forEach(doc=>{data[doc.id]=doc.data();});
-        generateSlots(data);
-        updateCounts(data);
-    });
-}
-
 // Tabs
 function switchBuff(buff){
     currentBuff=buff;
@@ -43,6 +34,16 @@ function switchBuff(buff){
 }
 
 // Slots
+function loadSlots(){
+    db.collection("slots").onSnapshot(snapshot=>{
+        let data={};
+        snapshot.forEach(doc=>{data[doc.id]=doc.data();});
+        generateSlots(data);
+        updateCounts(data);
+        updateTopSpeedups(data);
+    });
+}
+
 function generateSlots(data){
     grid.innerHTML="";
     for(let h=0;h<24;h++){
@@ -66,8 +67,7 @@ function generateSlots(data){
                 div.className="slot reserved";
                 div.innerHTML=`<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h,m+30)} UTC</span><span class='statusReserved'>Reserved</span></div>
                 <div class='timeLocal'>${localTime}</div>
-                <div class='bookingInfo'>${slot.alliance} - ${slot.player} (${slot.days} days)</div>
-                <div class='rankingInfo'>Rank: ${slot.rank ? slot.rank : '-'}</div>`;
+                <div class='bookingInfo'>${slot.alliance} - ${slot.player} (${slot.days} days)</div>`;
                 div.onclick=()=>slotClicked(id,'reserved',slot);
             }
             grid.appendChild(div);
@@ -92,7 +92,7 @@ function confirmBooking(){
     let alliance=document.getElementById("alliance").value;
     let player=document.getElementById("player").value;
     let password=document.getElementById("password").value;
-    let days=document.getElementById("daysSaved").value;
+    let days=parseInt(document.getElementById("daysSaved").value) || 0;
     db.collection("slots").doc(selectedSlot).set({alliance,player,password,days});
     closeModal();
 }
@@ -136,20 +136,23 @@ function updateCounts(data){
     document.getElementById("availableCount").innerText="Available "+(total-reserved);
 }
 
-// Top Speed-ups
-function loadSpeedups(){
-    db.collection("speedups").orderBy("speed","desc").limit(6).onSnapshot(snapshot=>{
-        const data=[]; snapshot.forEach(doc=>data.push(doc.data())); updateRanking(data);
-    });
-}
-function updateRanking(speedups){
-    const box=document.getElementById('rankingBox'); if(!box) return;
+// Top Speed-ups 실시간
+function updateTopSpeedups(data){
+    let players=[];
+    for(let key in data){ 
+        let p=data[key]; 
+        players.push({name:p.player, speed:p.days});
+    }
+    // 내림차순 정렬
+    players.sort((a,b)=>b.speed-a.speed);
+    let top6 = players.slice(0,6);
+    const box=document.getElementById('rankingBox'); 
+    if(!box) return;
     box.innerHTML='<b>Top Speed-ups</b><div style="display:flex; justify-content:center; gap:20px; margin-top:4px;">'+
-        '<div>'+speedups.slice(0,3).map((p,i)=>{const trophies=['🥇','🥈','🥉'];return `<div>${trophies[i]} ${p.name} (${p.speed})</div>`;}).join('')+'</div>'+
-        '<div>'+speedups.slice(3,6).map((p,i)=>{const colors=['#a0d8f0','#90c8e0','#80b8d0']; return `<div style="display:inline-block;background:${colors[i]};border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;margin-bottom:2px;">${i+4}</div> ${p.name} (${p.speed})`;}).join('')+'</div>'+
+        '<div>'+top6.slice(0,3).map((p,i)=>{const trophies=['🥇','🥈','🥉'];return `<div>${trophies[i]} ${p.name} (${p.speed})</div>`;}).join('')+'</div>'+
+        '<div>'+top6.slice(3,6).map((p,i)=>{const colors=['#a0d8f0','#90c8e0','#80b8d0']; return `<div style="display:inline-block;background:${colors[i]};border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;margin-bottom:2px;">${i+4}</div> ${p.name} (${p.speed})`;}).join('')+'</div>'+
         '</div>';
 }
-loadSpeedups();
 
 // Snow
 const canvas=document.getElementById("snow"); const ctx=canvas.getContext("2d");
