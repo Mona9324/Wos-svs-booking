@@ -11,7 +11,6 @@ const cancelModal = document.getElementById("cancelModal");
 const adminPanel = document.getElementById("adminPanel");
 const rankingBox = document.getElementById("rankingBox");
 
-// firebase.js에서 이미 db를 만들었다면 그걸 쓰고, 없으면 여기서 생성
 const dbRef = window.db || firebase.firestore();
 
 let bookingUnsubscribe = null;
@@ -123,7 +122,6 @@ function setBooking(isOpen) {
 
 function clearAll() {
   if (!adminAuthenticated) return;
-
   if (!confirm("전체 예약을 삭제할까요?")) return;
 
   dbRef.collection("slots").get()
@@ -336,7 +334,6 @@ function confirmCancel() {
     });
 }
 
-// Snow
 const canvas = document.getElementById("snow");
 const ctx = canvas.getContext("2d");
 const flakes = [];
@@ -386,7 +383,6 @@ function drawSnow() {
 
 window.addEventListener("resize", resizeCanvas);
 
-// 이벤트 연결
 document.getElementById("tab-monday").addEventListener("click", () => switchBuff("monday"));
 document.getElementById("tab-tuesday").addEventListener("click", () => switchBuff("tuesday"));
 document.getElementById("tab-thursday").addEventListener("click", () => switchBuff("thursday"));
@@ -403,7 +399,6 @@ document.getElementById("openBookingBtn").addEventListener("click", () => setBoo
 document.getElementById("closeBookingBtn").addEventListener("click", () => setBooking(false));
 document.getElementById("clearAllBtn").addEventListener("click", clearAll);
 
-// 시작
 initSnow();
 drawSnow();
 loadSlots();
