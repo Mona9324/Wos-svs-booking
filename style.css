@@ -1,6 +1,6 @@
 body{
 font-family:Arial;
-background:#eef5fb;
+background:#dce8f5;
 margin:0;
 text-align:center;
 }
@@ -17,7 +17,7 @@ font-size:18px;
 .availableDot{
 width:10px;
 height:10px;
-background:#8bd18b;
+background:#66cc66;
 display:inline-block;
 border-radius:50%;
 margin-right:6px;
@@ -26,7 +26,7 @@ margin-right:6px;
 .reservedDot{
 width:10px;
 height:10px;
-background:#d98c8c;
+background:#e06666;
 display:inline-block;
 border-radius:50%;
 margin-left:20px;
@@ -45,7 +45,7 @@ flex-wrap:wrap;
 padding:14px 20px;
 border:none;
 border-radius:12px;
-background:#7da7ff;
+background:#6f9cff;
 color:white;
 font-weight:bold;
 cursor:pointer;
@@ -68,13 +68,13 @@ min-height:110px;
 }
 
 .available{
-border:2px solid #8bd18b;
+border:2px solid #66cc66;
 cursor:pointer;
 }
 
 .reserved{
-border:2px solid #d98c8c;
-background:#f7eaea;
+border:2px solid #e06666;
+background:#fdecec;
 }
 
 .locked{
@@ -90,13 +90,11 @@ font-size:16px;
 .timeLocal{
 font-size:13px;
 color:#666;
-margin-top:3px;
 }
 
 .bookingInfo{
 font-size:12px;
 margin-top:8px;
-color:#333;
 }
 
 .modal{
@@ -131,7 +129,7 @@ border:1px solid #ccc;
 padding:10px;
 border:none;
 border-radius:8px;
-background:#7da7ff;
+background:#6f9cff;
 color:white;
 cursor:pointer;
 }
@@ -140,7 +138,7 @@ cursor:pointer;
 position:fixed;
 bottom:20px;
 right:20px;
-background:#6fa8ff;
+background:#6f9cff;
 color:white;
 border:none;
 padding:12px 16px;
