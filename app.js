@@ -19,12 +19,6 @@ function updateCountdown(){
 setInterval(updateCountdown,60000);
 updateCountdown();
 
-// Load slots
-db.collection("settings").doc("booking").onSnapshot(doc=>{
-    if(doc.exists) bookingOpen=doc.data().open;
-    loadSlots();
-});
-
 // Tabs
 function switchBuff(buff){
     currentBuff=buff;
@@ -67,7 +61,7 @@ function generateSlots(data){
                 div.className="slot reserved";
                 div.innerHTML=`<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h,m+30)} UTC</span><span class='statusReserved'>Reserved</span></div>
                 <div class='timeLocal'>${localTime}</div>
-                <div class='bookingInfo'>${slot.alliance} - ${slot.player} (${slot.days} days)</div>`;
+                <div class='bookingInfo'>[${slot.alliance}] ${slot.player} (${slot.days})</div>`;
                 div.onclick=()=>slotClicked(id,'reserved',slot);
             }
             grid.appendChild(div);
@@ -79,8 +73,10 @@ function padTime(h,m){if(m>=60){h+=1;m-=60;}if(h>=24) h-=24;return String(h).pad
 
 // Slot click
 function slotClicked(slotId,type,slotData=null){
-    document.querySelectorAll('.slot').forEach(el=>el.classList.remove('selected'));
-    const div=document.getElementById(slotId); div.classList.add('selected');
+    document.querySelectorAll('.slot').forEach(el=>el.classList.remove('selected','highlightAvailable','highlightReserved'));
+    const div=document.getElementById(slotId); 
+    if(type==='available') div.classList.add('highlightAvailable');
+    else if(type==='reserved') div.classList.add('highlightReserved');
     if(type==='available') openModal(slotId);
     else if(type==='reserved') openCancelModal(slotId,slotData);
 }
@@ -141,16 +137,24 @@ function updateTopSpeedups(data){
     let players=[];
     for(let key in data){ 
         let p=data[key]; 
-        players.push({name:p.player, speed:p.days});
+        players.push({alliance:p.alliance,name:p.player, speed:p.days});
     }
     // 내림차순 정렬
     players.sort((a,b)=>b.speed-a.speed);
     let top6 = players.slice(0,6);
     const box=document.getElementById('rankingBox'); 
     if(!box) return;
-    box.innerHTML='<b>Top Speed-ups</b><div style="display:flex; justify-content:center; gap:20px; margin-top:4px;">'+
-        '<div>'+top6.slice(0,3).map((p,i)=>{const trophies=['🥇','🥈','🥉'];return `<div>${trophies[i]} ${p.name} (${p.speed})</div>`;}).join('')+'</div>'+
-        '<div>'+top6.slice(3,6).map((p,i)=>{const colors=['#a0d8f0','#90c8e0','#80b8d0']; return `<div style="display:inline-block;background:${colors[i]};border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;margin-bottom:2px;">${i+4}</div> ${p.name} (${p.speed})`;}).join('')+'</div>'+
+    box.innerHTML='<b>Top Speed-ups</b><div style="display:flex; justify-content:center; gap:40px; margin-top:4px;">'+
+        '<div style="display:flex; flex-direction:column; gap:2px;">'+
+            top6.slice(0,3).map((p,i)=>{
+                const trophies=['🥇','🥈','🥉'];
+                return `<div>${trophies[i]} [${p.alliance}] ${p.name} (${p.speed})</div>`;
+            }).join('')+'</div>'+
+        '<div style="display:flex; flex-direction:column; gap:2px;">'+
+            top6.slice(3,6).map((p,i)=>{
+                const colors=['#a0d8f0','#90c8e0','#80b8d0'];
+                return `<div style="display:inline-block;background:${colors[i]};border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;margin-bottom:2px;">${i+4}</div> [${p.alliance}] ${p.name} (${p.speed})</div>`;
+            }).join('')+'</div>'+
         '</div>';
 }
 
