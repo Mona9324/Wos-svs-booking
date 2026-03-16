@@ -6,6 +6,9 @@ let bookingOpen=false;
 const svsDate=new Date("2026-03-23T00:00:00Z");
 const grid=document.getElementById("slots");
 
+// Firebase 초기화 (firebase.js에서 db 정의)
+const db=firebase.firestore();
+
 // Countdown
 function updateCountdown(){
     let now=new Date();
