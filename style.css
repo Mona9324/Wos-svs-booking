@@ -377,3 +377,167 @@ header,
     line-height: 1.8;
   }
 }
+
+/* ===== layout adjustments ===== */
+
+.tabsWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.slotStats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Admin button: bottom right */
+.adminFloating {
+  position: fixed !important;
+  right: 22px !important;
+  bottom: 22px !important;
+  left: auto !important;
+  transform: none !important;
+  z-index: 1200;
+}
+
+/* Admin popup: centered */
+.adminOverlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.adminOverlay.show {
+  display: flex;
+}
+
+.adminOverlay .adminPanel {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  top: auto !important;
+  margin: 0;
+  z-index: 1301;
+}
+
+#adminControls {
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ranking */
+#rankingBox {
+  margin-top: 14px;
+}
+
+.rankingGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.rankingDayCard {
+  padding: 12px 14px;
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+}
+
+.rankingDayTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.rankingItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.rankingItem.empty {
+  justify-content: center;
+  opacity: 0.8;
+}
+
+.medal {
+  min-width: 24px;
+  text-align: center;
+}
+
+.rankingText {
+  word-break: break-word;
+}
+
+/* slot card hover highlight */
+.slot.available:hover {
+  cursor: pointer;
+}
+
+.slot.reserved:hover {
+  cursor: pointer;
+}
+
+.slot.available:hover,
+.slot.highlightAvailable,
+.slot.selected.highlightAvailable {
+  transform: translateY(-2px);
+}
+
+.slot.reserved:hover,
+.slot.highlightReserved,
+.slot.selected.highlightReserved {
+  transform: translateY(-2px);
+}
+
+/* time row */
+.timeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.timeUTC {
+  white-space: nowrap;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .rankingGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .tabs {
+    width: 100%;
+  }
+
+  .tabs button {
+    width: 100%;
+  }
+
+  .timeRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .slotStats {
+    font-size: 0.95rem;
+  }
+}
