@@ -1,6 +1,6 @@
 body{
 font-family:Arial;
-background:#dce8f5;
+background:#eef5fb;
 margin:0;
 text-align:center;
 }
@@ -45,7 +45,7 @@ flex-wrap:wrap;
 padding:14px 20px;
 border:none;
 border-radius:12px;
-background:#6f9cff;
+background:#7da7ff;
 color:white;
 font-weight:bold;
 cursor:pointer;
@@ -129,7 +129,7 @@ border:1px solid #ccc;
 padding:10px;
 border:none;
 border-radius:8px;
-background:#6f9cff;
+background:#7da7ff;
 color:white;
 cursor:pointer;
 }
@@ -138,7 +138,7 @@ cursor:pointer;
 position:fixed;
 bottom:20px;
 right:20px;
-background:#6f9cff;
+background:#7da7ff;
 color:white;
 border:none;
 padding:12px 16px;
