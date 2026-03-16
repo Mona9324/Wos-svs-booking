@@ -26,7 +26,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 18px;
   position: relative;
   z-index: 1;
@@ -62,10 +62,10 @@ h1 {
 }
 
 .tabs {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  max-width: 920px;
+  max-width: 1180px;
   width: 100%;
   margin: 18px auto 0;
   padding: 0 20px;
@@ -73,13 +73,15 @@ h1 {
 }
 
 .tabs button {
-  flex: 1;
-  padding: 14px 10px;
+  width: 100%;
+  padding: 14px 12px;
   border: none;
   border-radius: 12px;
   background: #d8f2ff;
   color: #2d5468;
   font-weight: 700;
+  font-size: 16px;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.15s ease;
 }
@@ -96,8 +98,8 @@ h1 {
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  max-width: 920px;
+  gap: 16px;
+  max-width: 1180px;
   margin: 0 auto 30px;
   padding: 20px;
   box-sizing: border-box;
@@ -110,7 +112,7 @@ h1 {
   border-radius: 12px;
   text-align: left;
   min-height: 128px;
-  padding: 12px;
+  padding: 14px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -159,13 +161,13 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;
+  gap: 10px;
 }
 
 .timeUTC {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
+  letter-spacing: 0.1px;
   white-space: nowrap;
 }
 
@@ -343,53 +345,42 @@ h1 {
 }
 
 #rankingBox {
-  width: 100%;
-  max-width: 920px;
+  width: calc(100% - 40px);
+  max-width: 1180px;
   margin: 14px auto 0;
   background: rgba(255, 255, 255, 0.95);
-  padding: 12px 14px;
+  padding: 14px 18px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
-  text-align: left;
+  text-align: center;
   box-sizing: border-box;
 }
 
 .rankingTitle {
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   text-align: center;
 }
 
-.rankingGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 10px;
-}
-
-.rankingDayCard {
-  padding: 12px 14px;
-  border-radius: 14px;
-  backdrop-filter: blur(6px);
-}
-
-.rankingDayTitle {
-  font-weight: 700;
-  margin-bottom: 8px;
-  text-align: center;
+.rankingList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
 .rankingItem {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin: 6px 0;
+  margin: 0;
   font-size: 14px;
   line-height: 1.4;
+  text-align: center;
 }
 
 .rankingItem.empty {
-  justify-content: center;
   opacity: 0.8;
 }
 
@@ -404,36 +395,40 @@ h1 {
 }
 
 @media (max-width: 980px) {
+  .tabs,
+  .grid,
   #rankingBox {
-    max-width: 920px;
-    width: calc(100% - 32px);
+    max-width: 1000px;
   }
 }
 
 @media (max-width: 900px) {
-  .rankingGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 820px) {
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .tabs button {
+    font-size: 15px;
+  }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 700px) {
   .tabs {
-    width: 100%;
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .tabs button {
-    width: 100%;
+    white-space: normal;
   }
 
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
   }
 
   .timeRow {
