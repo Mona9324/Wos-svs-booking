@@ -10,7 +10,7 @@ header { padding: 20px; position: relative; }
 
 .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 20px; max-width: 900px; margin: auto; }
 
-.slot { background: #fffaf2; padding: 10px; border-radius: 12px; text-align: left; transition: 0.3s; min-height: 100px; display: flex; flex-direction: column; justify-content: center; }
+.slot { background: #fffaf2; padding: 10px; border-radius: 12px; text-align: left; transition: 0.3s; min-height: 120px; display: flex; flex-direction: column; justify-content: center; }
 .slot.available { border: 2px solid #8bd18b; cursor: pointer; }
 .slot.reserved { border: 2px solid #d98c8c; background: #f7eaea; }
 .slot.locked { border: 2px solid #aaa; background: #eee; }
