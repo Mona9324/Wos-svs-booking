@@ -13,8 +13,7 @@ function updateCountdown(){
     let d=Math.floor(diff/(1000*60*60*24));
     let h=Math.floor((diff/(1000*60*60))%24);
     let m=Math.floor((diff/(1000*60))%60);
-    document.getElementById("countdown").innerHTML=
-        "SVS begins in "+d+"d "+h+"h "+m+"m";
+    document.getElementById("countdown").innerHTML="SVS begins in "+d+"d "+h+"h "+m+"m";
 }
 setInterval(updateCountdown,60000);
 updateCountdown();
@@ -52,7 +51,7 @@ function generateSlots(data){
 
             if(!bookingOpen){
                 div.className="slot locked";
-                div.innerHTML="<b>"+utcTime+" - "+padTime(h,m+30)+" UTC</b><br>"+localTime+"<br>🔒";
+                div.innerHTML=`<b>${utcTime} - ${padTime(h,m+30)} UTC</b><br>${localTime}<br>🔒`;
             }else if(!slot){
                 div.className="slot available";
                 div.innerHTML=`<div class='timeRow'><span class='timeUTC'>${utcTime} - ${padTime(h,m+30)} UTC</span><span class='statusAvailable'>Available</span></div><div class='timeLocal'>${localTime}</div>`;
@@ -132,29 +131,22 @@ function updateCounts(data){
     document.getElementById("availableCount").innerText="Available "+(total-reserved);
 }
 
-// Top Speed-ups 실시간
+// Top Speed-ups
 function updateTopSpeedups(data){
     let players=[];
     for(let key in data){ 
         let p=data[key]; 
         players.push({alliance:p.alliance,name:p.player, speed:p.days});
     }
-    // 내림차순 정렬
     players.sort((a,b)=>b.speed-a.speed);
     let top6 = players.slice(0,6);
     const box=document.getElementById('rankingBox'); 
     if(!box) return;
     box.innerHTML='<b>Top Speed-ups</b><div style="display:flex; justify-content:center; gap:40px; margin-top:4px;">'+
         '<div style="display:flex; flex-direction:column; gap:2px;">'+
-            top6.slice(0,3).map((p,i)=>{
-                const trophies=['🥇','🥈','🥉'];
-                return `<div>${trophies[i]} [${p.alliance}] ${p.name} (${p.speed})</div>`;
-            }).join('')+'</div>'+
+            top6.slice(0,3).map((p,i)=>{const trophies=['🥇','🥈','🥉'];return `<div>${trophies[i]} [${p.alliance}] ${p.name} (${p.speed})</div>`;}).join('')+'</div>'+
         '<div style="display:flex; flex-direction:column; gap:2px;">'+
-            top6.slice(3,6).map((p,i)=>{
-                const colors=['#a0d8f0','#90c8e0','#80b8d0'];
-                return `<div style="display:inline-block;background:${colors[i]};border-radius:50%;width:24px;height:24px;text-align:center;line-height:24px;margin-bottom:2px;">${i+4}</div> [${p.alliance}] ${p.name} (${p.speed})</div>`;
-            }).join('')+'</div>'+
+            top6.slice(3,6).map((p,i)=>{const colors=['#a0d8f0','#90c8e0','#80b8d0']; return `<div style="display:inline-block;background:${colors[i]};border-radius:50%;width:30px;height:24px;text-align:center;line-height:24px;margin-bottom:2px;">${i+4}</div> [${p.alliance}] ${p.name} (${p.speed})</div>`;}).join('')+'</div>'+
         '</div>';
 }
 
