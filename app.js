@@ -4,12 +4,7 @@ const ADMIN_PASSWORD = "2737admin";
 let adminAuthenticated = false;
 let bookingOpen = false;
 const svsDate = new Date("2026-03-23T00:00:00Z");
-
 const grid = document.getElementById("slots");
-const modal = document.getElementById("modal");
-const cancelModal = document.getElementById("cancelModal");
-const adminPanel = document.getElementById("adminPanel");
-const rankingBox = document.getElementById("rankingBox");
 
 const dbRef = window.db || firebase.firestore();
 
@@ -41,33 +36,40 @@ function padTime(h, m) {
   return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
 }
 
+function setActiveTab() {
+  const buttons = document.querySelectorAll(".tabs button");
+  buttons.forEach((btn) => btn.classList.remove("active"));
+
+  if (currentBuff === "monday" && buttons[0]) buttons[0].classList.add("active");
+  if (currentBuff === "tuesday" && buttons[1]) buttons[1].classList.add("active");
+  if (currentBuff === "thursday" && buttons[2]) buttons[2].classList.add("active");
+}
+
 function clearSelection() {
   document.querySelectorAll(".slot").forEach((slot) => {
-    slot.classList.remove("selected", "highlight-available", "highlight-reserved");
+    slot.classList.remove("selected", "highlightAvailable", "highlightReserved");
   });
 }
 
 function highlightSlot(div, isAvailable) {
   clearSelection();
   div.classList.add("selected");
-  div.classList.add(isAvailable ? "highlight-available" : "highlight-reserved");
+  div.classList.add(isAvailable ? "highlightAvailable" : "highlightReserved");
 }
 
 function switchBuff(buff) {
   currentBuff = buff;
-  document.querySelectorAll(".tab-button").forEach((btn) => btn.classList.remove("active"));
-  const tab = document.getElementById(`tab-${buff}`);
-  if (tab) tab.classList.add("active");
+  setActiveTab();
   loadSlots();
 }
 
 function openReserveModal(id) {
   selectedSlot = id;
-  modal.classList.add("show");
+  document.getElementById("modal").classList.add("show");
 }
 
 function closeModal() {
-  modal.classList.remove("show");
+  document.getElementById("modal").classList.remove("show");
   document.getElementById("alliance").value = "";
   document.getElementById("player").value = "";
   document.getElementById("daysSaved").value = "";
@@ -77,21 +79,21 @@ function closeModal() {
 
 function openCancelModal(id) {
   selectedSlot = id;
-  cancelModal.classList.add("show");
+  document.getElementById("cancelModal").classList.add("show");
 }
 
 function closeCancelModal() {
-  cancelModal.classList.remove("show");
+  document.getElementById("cancelModal").classList.remove("show");
   document.getElementById("cancelPassword").value = "";
   clearSelection();
 }
 
 function openAdmin() {
-  adminPanel.classList.add("show");
+  document.getElementById("adminPanel").classList.add("show");
 }
 
 function closeAdmin() {
-  adminPanel.classList.remove("show");
+  document.getElementById("adminPanel").classList.remove("show");
 }
 
 function adminLogin() {
@@ -144,11 +146,8 @@ function updateCounts(data) {
   for (let h = 0; h < 24; h++) {
     for (let m = 0; m < 60; m += 30) {
       const id = `${currentBuff}_${padTime(h, m)}`;
-      if (data[id]) {
-        reserved++;
-      } else {
-        available++;
-      }
+      if (data[id]) reserved++;
+      else available++;
     }
   }
 
@@ -162,17 +161,17 @@ function updateTopSpeedups(data) {
     .sort((a, b) => Number(b.daysSaved) - Number(a.daysSaved))
     .slice(0, 6);
 
-  let html = '<div class="ranking-title">Top Speed-ups</div>';
+  let html = '<div class="rankingTitle">Top Speed-ups</div>';
 
   if (allSlots.length === 0) {
-    html += '<div class="ranking-item">No data yet</div>';
+    html += '<div class="rankingItem">No data yet</div>';
   } else {
     allSlots.forEach((slot, idx) => {
-      html += `<div class="ranking-item"><span>${idx + 1}</span> ${slot.player || "-"} (${slot.daysSaved})</div>`;
+      html += `<div class="rankingItem"><span>${idx + 1}</span> ${slot.player || "-"} (${slot.daysSaved})</div>`;
     });
   }
 
-  rankingBox.innerHTML = html;
+  document.getElementById("rankingBox").innerHTML = html;
 }
 
 function generateSlots(data) {
@@ -197,40 +196,40 @@ function generateSlots(data) {
       if (!bookingOpen) {
         div.classList.add("locked");
         div.innerHTML = `
-          <div class="time-row">
-            <span class="time-utc">${utcTime} - ${padTime(h, m + 30)} UTC</span>
+          <div class="timeRow">
+            <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
           </div>
-          <div class="time-local">${localTime}</div>
-          <div class="booking-info">🔒 Booking Closed</div>
+          <div class="timeLocal">${localTime}</div>
+          <div class="bookingInfo">🔒 Booking Closed</div>
         `;
       } else if (!slot) {
         div.classList.add("available");
         div.innerHTML = `
-          <div class="time-row">
-            <span class="time-utc">${utcTime} - ${padTime(h, m + 30)} UTC</span>
-            <span class="status-available">Available</span>
+          <div class="timeRow">
+            <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
+            <span class="statusAvailable">Available</span>
           </div>
-          <div class="time-local">${localTime}</div>
-          <div class="booking-info">&nbsp;</div>
+          <div class="timeLocal">${localTime}</div>
+          <div class="bookingInfo">&nbsp;</div>
         `;
-        div.addEventListener("click", () => {
+        div.onclick = () => {
           highlightSlot(div, true);
           openReserveModal(id);
-        });
+        };
       } else {
         div.classList.add("reserved");
         div.innerHTML = `
-          <div class="time-row">
-            <span class="time-utc">${utcTime} - ${padTime(h, m + 30)} UTC</span>
-            <span class="status-reserved">Reserved</span>
+          <div class="timeRow">
+            <span class="timeUTC">${utcTime} - ${padTime(h, m + 30)} UTC</span>
+            <span class="statusReserved">Reserved</span>
           </div>
-          <div class="time-local">${localTime}</div>
-          <div class="booking-info">[${slot.alliance}] ${slot.player} (${slot.daysSaved})</div>
+          <div class="timeLocal">${localTime}</div>
+          <div class="bookingInfo">[${slot.alliance}] ${slot.player} (${slot.daysSaved})</div>
         `;
-        div.addEventListener("click", () => {
+        div.onclick = () => {
           highlightSlot(div, false);
           openCancelModal(id);
-        });
+        };
       }
 
       grid.appendChild(div);
@@ -253,9 +252,7 @@ function attachRealtimeListeners() {
     (doc) => {
       bookingOpen = doc.exists ? Boolean(doc.data().open) : false;
 
-      if (slotsUnsubscribe) {
-        slotsUnsubscribe();
-      }
+      if (slotsUnsubscribe) slotsUnsubscribe();
 
       slotsUnsubscribe = dbRef.collection("slots").onSnapshot(
         (snapshot) => {
@@ -338,6 +335,7 @@ function confirmCancel() {
     });
 }
 
+/* blue snow */
 const canvas = document.getElementById("snow");
 const ctx = canvas.getContext("2d");
 const flakes = [];
@@ -355,8 +353,8 @@ function initSnow() {
     flakes.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      radius: Math.random() * 2.5 + 0.8,
-      speedY: Math.random() * 0.9 + 0.35,
+      radius: Math.random() * 2.6 + 0.8,
+      speedY: Math.random() * 0.9 + 0.3,
       speedX: Math.random() * 0.4 - 0.2
     });
   }
@@ -368,7 +366,7 @@ function drawSnow() {
   flakes.forEach((f) => {
     ctx.beginPath();
     ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    ctx.fillStyle = "rgba(170, 210, 255, 0.85)";
     ctx.fill();
 
     f.y += f.speedY;
@@ -386,26 +384,12 @@ function drawSnow() {
   requestAnimationFrame(drawSnow);
 }
 
-document.getElementById("tab-monday").addEventListener("click", () => switchBuff("monday"));
-document.getElementById("tab-tuesday").addEventListener("click", () => switchBuff("tuesday"));
-document.getElementById("tab-thursday").addEventListener("click", () => switchBuff("thursday"));
-
-document.getElementById("reserveBtn").addEventListener("click", confirmBooking);
-document.getElementById("cancelBtn").addEventListener("click", confirmCancel);
-document.getElementById("closeReserveBtn").addEventListener("click", closeModal);
-document.getElementById("closeCancelBtn").addEventListener("click", closeCancelModal);
-
-document.getElementById("adminOpenBtn").addEventListener("click", openAdmin);
-document.getElementById("adminCloseBtn").addEventListener("click", closeAdmin);
-document.getElementById("adminLoginBtn").addEventListener("click", adminLogin);
-document.getElementById("openBookingBtn").addEventListener("click", () => setBooking(true));
-document.getElementById("closeBookingBtn").addEventListener("click", () => setBooking(false));
-document.getElementById("clearAllBtn").addEventListener("click", clearAll);
-
 window.addEventListener("resize", resizeCanvas);
 setInterval(updateCountdown, 60000);
 
+/* default */
 updateCountdown();
+setActiveTab();
 initSnow();
 drawSnow();
 loadSlots();
