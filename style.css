@@ -4,11 +4,11 @@ header { padding: 20px; position: relative; }
 .availableDot { width: 10px; height: 10px; background: #8bd18b; display: inline-block; border-radius: 50%; margin-right: 6px; }
 .reservedDot { width: 10px; height: 10px; background: #d98c8c; display: inline-block; border-radius: 50%; margin-left: 20px; margin-right: 6px; }
 
-.tabs { margin: 20px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-.tabs button { padding: 14px 24px; border: none; border-radius: 12px; background: #7da7ff; color: white; font-weight: bold; cursor: pointer; }
+.tabs { display: flex; justify-content: center; margin: 20px 0; }
+.tabs button { flex: 1; padding: 14px; margin: 0 5px; border: none; border-radius: 12px; background: #7da7ff; color: white; font-weight: bold; cursor: pointer; }
 .tabs button.active { background: #5f85d6; }
 
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 20px; max-width: 900px; margin: auto; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 20px; max-width: 900px; margin: auto; }
 
 .slot { background: #fffaf2; padding: 10px; border-radius: 12px; text-align: left; transition: 0.3s; min-height: 100px; display: flex; flex-direction: column; justify-content: center; }
 .slot.available { border: 2px solid #8bd18b; cursor: pointer; }
@@ -19,7 +19,7 @@ header { padding: 20px; position: relative; }
 .selected.highlightReserved { background-color: #f5c2c2; }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
-.modalBox { background: white; padding: 24px; border-radius: 14px; display: flex; flex-direction: column; gap: 10px; width: 260px; margin: auto; position: relative; top: 50%; transform: translateY(-50%); }
+.modalBox { background: white; padding: 24px; border-radius: 14px; display: flex; flex-direction: column; gap: 10px; width: 280px; margin: auto; position: relative; top: 50%; transform: translateY(-50%); }
 .modalBox input { padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
 .modalBox button { padding: 10px; border: none; border-radius: 8px; background: #7da7ff; color: white; cursor: pointer; }
 
@@ -36,6 +36,5 @@ header { padding: 20px; position: relative; }
 .statusReserved { color: #F44336; font-weight: bold; margin-left: 5px; }
 
 #rankingBox { position: absolute; top: 10px; right: 10px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 4px; }
-
-.rankingItem { display: flex; align-items: center; gap: 6px; }
+.rankingItem { display: flex; gap: 6px; align-items: center; }
 .rankingItem span { font-weight: bold; }
