@@ -21,19 +21,19 @@
     <div id="tabBookingState" class="subInfo"></div>
   </header>
 
-<section class="topToolbarWrap">
-  <div class="toolbar toolbarTopRight">
-    <input id="searchInput" type="text" placeholder="Search alliance / player">
-    <select id="filterStatus" onchange="renderAll()">
-      <option value="all">All</option>
-      <option value="available">Available only</option>
-      <option value="reserved">Reserved only</option>
-      <option value="mine">My reservation only</option>
-    </select>
-    <button type="button" onclick="clearSearch()">Clear Filter</button>
-  </div>
-</section>
-  
+  <section class="topToolbarWrap">
+    <div class="toolbar toolbarTopRight">
+      <input id="searchInput" type="text" placeholder="Search alliance / player">
+      <select id="filterStatus" onchange="renderAll()">
+        <option value="all">All</option>
+        <option value="available">Available only</option>
+        <option value="reserved">Reserved only</option>
+        <option value="mine">My reservation only</option>
+      </select>
+      <button type="button" onclick="clearSearch()">Clear</button>
+    </div>
+  </section>
+
   <section class="tabsWrap">
     <div class="tabs">
       <button type="button" id="tab-monday" onclick="switchBuff('monday')">Monday (Construction)</button>
