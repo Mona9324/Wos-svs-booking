@@ -279,6 +279,7 @@ function updateBookingGuide() {
 
   guide.textContent =
     "Day 1 (Thu): 30d+ speed-up / Day 2 (Fri): 15d+ speed-up / Day 3+: Free booking"
+    guide.textContent =
     "1일차: 가속 30일 이상 / 2일차: 가속 15일 이상 / 3일차부터 자유 예약";
 }
 
