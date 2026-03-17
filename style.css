@@ -581,6 +581,7 @@ h1 {
   animation: toastIn 0.25s ease;
   font-size: 14px;
   text-align: left;
+  white-space: pre-line;
 }
 
 .toast.success {
