@@ -142,7 +142,9 @@ function isMyReservation(slot) {
 }
 
 function getTabSetting(buff) {
-  return bookingSettings.tabs[buff] || { manualOpen: true, openAt: "", closeAt: "" };
+  var base = { manualOpen: true, openAt: "", closeAt: "" };
+  var current = (bookingSettings.tabs && bookingSettings.tabs[buff]) || {};
+  return Object.assign({}, base, current);
 }
 
 function parseLocalDateTime(value) {
@@ -482,10 +484,28 @@ function setManualBooking(buff, isOpen) {
 
   db.collection("settings").doc("booking").set(data, { merge: true })
     .then(function () {
-      return logAction("set_manual_booking", { buff: buff, isOpen: isOpen });
+
+      // 🔥 로컬 상태 즉시 반영
+      if (!bookingSettings.tabs) bookingSettings.tabs = {};
+      if (!bookingSettings.tabs[buff]) {
+        bookingSettings.tabs[buff] = { manualOpen: true, openAt: "", closeAt: "" };
+      }
+
+      bookingSettings.tabs[buff].manualOpen = isOpen;
+
+      // 🔥 UI 즉시 반영
+      renderAll();
+
+      return logAction("set_manual_booking", {
+        buff: buff,
+        isOpen: isOpen
+      });
     })
     .then(function () {
-      showToast(isOpen ? "현재 탭 예약이 열렸습니다." : "현재 탭 예약이 잠겼습니다.", "success");
+      showToast(
+        isOpen ? "현재 탭 예약이 열렸습니다." : "현재 탭 예약이 잠겼습니다.",
+        "success"
+      );
     })
     .catch(function (error) {
       console.error("setManualBooking error:", error);
@@ -715,22 +735,33 @@ function attachRealtimeListeners() {
     slotsUnsubscribe = null;
   }
 
-  bookingUnsubscribe = db.collection("settings").doc("booking").onSnapshot(
-    function (doc) {
-      if (doc.exists) {
-        var data = doc.data();
-        bookingSettings.baseDate = data.baseDate || bookingSettings.baseDate;
-        bookingSettings.tabs = data.tabs || bookingSettings.tabs;
-      }
-      populateScheduleInputs();
-      updateCountdown();
-      renderAll();
-    },
-    function (error) {
-      console.error("booking onSnapshot error:", error);
-      renderAll();
-    }
-  );
+ db.collection("settings").doc("booking").onSnapshot(function (doc) {
+  if (doc.exists) {
+    var data = doc.data();
+
+    bookingSettings.baseDate = data.baseDate || bookingSettings.baseDate;
+
+    // 🔥 기본값 정의
+    var defaultTabs = {
+      monday: { manualOpen: true, openAt: "", closeAt: "" },
+      tuesday: { manualOpen: true, openAt: "", closeAt: "" },
+      thursday: { manualOpen: true, openAt: "", closeAt: "" }
+    };
+
+    // 🔥 병합 (중요)
+    bookingSettings.tabs = Object.assign({}, defaultTabs, data.tabs || {});
+
+    Object.keys(defaultTabs).forEach(function (key) {
+      bookingSettings.tabs[key] = Object.assign(
+        {},
+        defaultTabs[key],
+        bookingSettings.tabs[key] || {}
+      );
+    });
+  }
+
+  renderAll();
+});
 
   slotsUnsubscribe = db.collection("slots").onSnapshot(
     function (snapshot) {
