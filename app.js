@@ -185,10 +185,10 @@ function updateTabBookingStateText() {
 }
 
 function getBaseDate() {
-  var raw = bookingSettings.baseDate || "2026-03-23";
+  var raw = bookingSettings.baseDate || "2026-03-28";
   var date = new Date(raw + "T12:00:00Z");
   if (isNaN(date.getTime())) {
-    date = new Date("2026-03-23T12:00:00Z");
+    date = new Date("2026-03-28T12:00:00Z");
   }
   return date;
 }
