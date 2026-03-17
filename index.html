@@ -9,17 +9,23 @@
 <body>
   <canvas id="snow"></canvas>
 
-  <header>
+<header>
   <h1><span id="snowSecret">❄</span> 2737 SVS Booking</h1>
+
+  <!-- 가장 크게 보여줄 예약 오픈/마감 카운트 -->
+  <div id="tabBookingState" class="headlineCountdown"></div>
+
+  <!-- Next SVS 카운트 -->
+  <div id="countdown"></div>
 
   <div class="creatorBadge">
     <img src="creator-dino.png" alt="Creator artwork" class="creatorAvatar">
     <div class="creatorCredit">Mona</div>
   </div>
 
-  <div id="countdown"></div>
+  <!-- 작은 설명줄 -->
   <div id="svsCycleInfo" class="subInfo"></div>
-  <div id="tabBookingState" class="subInfo"></div>
+  <div id="bookingGuide" class="subInfo"></div>
 
   <div class="headerToolbar">
     <input id="searchInput" type="text" placeholder="Search alliance / player">
