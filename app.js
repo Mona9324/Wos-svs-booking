@@ -62,6 +62,13 @@ function simpleHash(value) {
   return "h_" + Math.abs(hash);
 }
 
+function parseLocalDateTime(value) {
+  if (!value) return null;
+  var date = new Date(value);
+  if (isNaN(date.getTime())) return null;
+  return date;
+}
+
 function showToast(message, type) {
   var container = document.getElementById("toastContainer");
   if (!container) return;
@@ -79,13 +86,9 @@ function showToast(message, type) {
   }, 2200);
 }
 
-function parseLocalDateTime(value) {
-  if (!value) return null;
-  var date = new Date(value);
-  if (isNaN(date.getTime())) return null;
-  return date;
-}
-
+/* =========================
+   local storage helpers
+========================= */
 function getSavedAlliances() {
   try {
     var raw = localStorage.getItem(ALLIANCE_STORAGE_KEY);
@@ -115,10 +118,8 @@ function renderAllianceSuggestions() {
   var list = document.getElementById("allianceSuggestions");
   if (!list) return;
 
-  var items = getSavedAlliances();
   list.innerHTML = "";
-
-  items.forEach(function (item) {
+  getSavedAlliances().forEach(function (item) {
     var option = document.createElement("option");
     option.value = item;
     list.appendChild(option);
@@ -151,7 +152,7 @@ function isMyReservation(slot) {
 }
 
 /* =========================
-   settings / booking state
+   booking setting helpers
 ========================= */
 function getTabSetting(buff) {
   var base = { manualOpen: true, openAt: "", closeAt: "" };
@@ -162,16 +163,72 @@ function getTabSetting(buff) {
 function isBuffBookingOpen(buff) {
   var setting = getTabSetting(buff);
   var now = new Date();
-
-  if (!setting.manualOpen) return false;
-
   var openAt = parseLocalDateTime(setting.openAt);
   var closeAt = parseLocalDateTime(setting.closeAt);
 
+  if (!setting.manualOpen) return false;
   if (openAt && now < openAt) return false;
   if (closeAt && now > closeAt) return false;
 
   return true;
+}
+
+/* =========================
+   SVS countdown
+========================= */
+function getBaseDate() {
+  var raw = bookingSettings.baseDate || "2026-03-23";
+  var date = new Date(raw + "T12:00:00Z");
+  if (isNaN(date.getTime())) {
+    date = new Date("2026-03-23T12:00:00Z");
+  }
+  return date;
+}
+
+function getNextSvsDate() {
+  var now = new Date();
+  var base = getBaseDate();
+  var next = new Date(base.getTime());
+  var cycleMs = 28 * 24 * 60 * 60 * 1000;
+
+  while (next <= now) {
+    next = new Date(next.getTime() + cycleMs);
+  }
+
+  return next;
+}
+
+function updateCountdown() {
+  var svsDate = getNextSvsDate();
+  var now = new Date();
+  var diff = svsDate - now;
+
+  if (diff <= 0) {
+    var countdownEl = document.getElementById("countdown");
+    if (countdownEl) countdownEl.innerText = "SVS has begun";
+    return;
+  }
+
+  var d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  var h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  var m = Math.floor((diff / (1000 * 60)) % 60);
+
+  var countdown = document.getElementById("countdown");
+  if (countdown) {
+    countdown.innerText = "Next SVS begins in " + d + "d " + h + "h " + m + "m";
+  }
+
+  var cycleInfo = document.getElementById("svsCycleInfo");
+  if (cycleInfo) {
+    var utcText =
+      svsDate.getUTCFullYear() + "." +
+      String(svsDate.getUTCMonth() + 1).padStart(2, "0") + "." +
+      String(svsDate.getUTCDate()).padStart(2, "0") + " " +
+      String(svsDate.getUTCHours()).padStart(2, "0") + ":" +
+      String(svsDate.getUTCMinutes()).padStart(2, "0") + " UTC";
+
+    cycleInfo.textContent = "28-day cycle / Next SVS: " + utcText;
+  }
 }
 
 function updateTabBookingStateText() {
@@ -216,58 +273,6 @@ function updateTabBookingStateText() {
   el.textContent = "Booking open";
 }
 
-function getBaseDate() {
-  var raw = bookingSettings.baseDate || "2026-03-23";
-  var date = new Date(raw + "T12:00:00Z");
-  if (isNaN(date.getTime())) {
-    date = new Date("2026-03-23T12:00:00Z");
-  }
-  return date;
-}
-
-function getNextSvsDate() {
-  var now = new Date();
-  var base = getBaseDate();
-  var next = new Date(base.getTime());
-  var cycleMs = 28 * 24 * 60 * 60 * 1000;
-
-  while (next <= now) {
-    next = new Date(next.getTime() + cycleMs);
-  }
-
-  return next;
-}
-
-function updateCountdown() {
-  var svsDate = getNextSvsDate();
-  var now = new Date();
-  var diff = svsDate - now;
-
-  if (diff <= 0) {
-    document.getElementById("countdown").innerText = "SVS has begun";
-    return;
-  }
-
-  var d = Math.floor(diff / (1000 * 60 * 60 * 24));
-  var h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  var m = Math.floor((diff / (1000 * 60)) % 60);
-
-  document.getElementById("countdown").innerText =
-    "Next SVS begins in " + d + "d " + h + "h " + m + "m";
-
-  var cycleInfo = document.getElementById("svsCycleInfo");
-  if (cycleInfo) {
-    var utcText =
-      svsDate.getUTCFullYear() + "." +
-      String(svsDate.getUTCMonth() + 1).padStart(2, "0") + "." +
-      String(svsDate.getUTCDate()).padStart(2, "0") + " " +
-      String(svsDate.getUTCHours()).padStart(2, "0") + ":" +
-      String(svsDate.getUTCMinutes()).padStart(2, "0") + " UTC";
-
-    cycleInfo.textContent = "28-day cycle / Next SVS: " + utcText;
-  }
-}
-
 function refreshTimeTexts() {
   updateCountdown();
   updateTabBookingStateText();
@@ -300,11 +305,8 @@ function clearSelection() {
 function highlightSlot(div, isAvailable) {
   clearSelection();
   div.classList.add("selected");
-  if (isAvailable) {
-    div.classList.add("highlightAvailable");
-  } else {
-    div.classList.add("highlightReserved");
-  }
+  if (isAvailable) div.classList.add("highlightAvailable");
+  else div.classList.add("highlightReserved");
 }
 
 function switchBuff(buff) {
@@ -375,13 +377,16 @@ function openReservedModal(id) {
 
   var detail = document.getElementById("reservedDetail");
   if (detail && slot) {
-    detail.innerHTML =
+    var html =
       "Alliance: " + escapeHtml(slot.alliance || "-") + "<br>" +
       "Player: " + escapeHtml(slot.player || "-") + "<br>" +
-      "Use Speed-up: " + escapeHtml(slot.daysSaved || 0) +
-      (slot.adminNote && adminAuthenticated
-        ? "<br>Admin Note: " + escapeHtml(slot.adminNote)
-        : "");
+      "Use Speed-up: " + escapeHtml(slot.daysSaved || 0);
+
+    if (slot.adminNote && adminAuthenticated) {
+      html += "<br>Admin Note: " + escapeHtml(slot.adminNote);
+    }
+
+    detail.innerHTML = html;
   }
 
   var editAlliance = document.getElementById("editAlliance");
@@ -402,10 +407,12 @@ function openReservedModal(id) {
 
 function closeReservedModal() {
   document.getElementById("reservedModal").classList.remove("show");
+
   ["editAlliance", "editDaysSaved", "editPassword"].forEach(function (id) {
     var el = document.getElementById(id);
     if (el) el.value = "";
   });
+
   selectedSlot = null;
   clearSelection();
 }
@@ -429,9 +436,7 @@ function updateAdminSelectedSlotLabel() {
   var label = document.getElementById("adminSelectedSlotLabel");
   if (!label) return;
 
-  label.textContent = adminSlotTarget
-    ? ("선택 슬롯: " + adminSlotTarget)
-    : "선택된 슬롯 없음";
+  label.textContent = adminSlotTarget ? ("선택 슬롯: " + adminSlotTarget) : "선택된 슬롯 없음";
 
   var noteInput = document.getElementById("adminNoteInput");
   if (noteInput) {
@@ -492,6 +497,7 @@ function checkAdminStatus() {
     .then(function (doc) {
       adminAuthenticated = doc.exists;
       updateAdminUI();
+
       if (adminAuthenticated) {
         showToast("관리자 인증 완료", "success");
         loadLogs();
@@ -589,6 +595,7 @@ function saveTabSchedule() {
       if (!bookingSettings.tabs[currentBuff]) {
         bookingSettings.tabs[currentBuff] = { manualOpen: true, openAt: "", closeAt: "" };
       }
+
       bookingSettings.tabs[currentBuff].openAt = openAt;
       bookingSettings.tabs[currentBuff].closeAt = closeAt;
 
@@ -690,12 +697,18 @@ function updateCounts(filteredIds) {
     }
   });
 
-  document.getElementById("availableCount").innerText = "Available " + available;
-  document.getElementById("reservedCount").innerText = "Reserved " + reserved;
-  document.getElementById("myCount").innerText = "My Reservation " + mine;
+  var a = document.getElementById("availableCount");
+  var r = document.getElementById("reservedCount");
+  var m = document.getElementById("myCount");
+
+  if (a) a.innerText = "Available " + available;
+  if (r) r.innerText = "Reserved " + reserved;
+  if (m) m.innerText = "My Reservation " + mine;
 }
 
 function generateSlots() {
+  if (!grid) return;
+
   grid.innerHTML = "";
   var filteredIds = getFilteredSlotIds();
   var open = isBuffBookingOpen(currentBuff);
@@ -723,13 +736,8 @@ function generateSlots() {
     var div = document.createElement("div");
     div.className = "slot";
 
-    if (id === recentBookedSlotId) {
-      div.classList.add("successFlash");
-    }
-
-    if (slot && isMyReservation(slot)) {
-      div.classList.add("myReservation");
-    }
+    if (id === recentBookedSlotId) div.classList.add("successFlash");
+    if (slot && isMyReservation(slot)) div.classList.add("myReservation");
 
     if (!open && !slot) {
       div.classList.add("locked");
@@ -826,13 +834,8 @@ function attachRealtimeListeners() {
         };
 
         bookingSettings.tabs = Object.assign({}, defaultTabs, data.tabs || {});
-
         Object.keys(defaultTabs).forEach(function (key) {
-          bookingSettings.tabs[key] = Object.assign(
-            {},
-            defaultTabs[key],
-            bookingSettings.tabs[key] || {}
-          );
+          bookingSettings.tabs[key] = Object.assign({}, defaultTabs[key], bookingSettings.tabs[key] || {});
         });
       }
 
@@ -928,7 +931,6 @@ function confirmBooking() {
 
   var daysSaved = Number(daysSavedRaw);
   var playerNorm = normalizeText(player);
-
   var slotRef = db.collection("slots").doc(selectedSlot);
   var playerLockId = currentBuff + "__" + playerNorm;
   var playerLockRef = db.collection("playerBookings").doc(playerLockId);
@@ -1392,15 +1394,17 @@ function registerSecretClick() {
    snow animation
 ========================= */
 var canvas = document.getElementById("snow");
-var ctx = canvas.getContext("2d");
+var ctx = canvas ? canvas.getContext("2d") : null;
 var flakes = [];
 
 function resizeCanvas() {
+  if (!canvas) return;
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
 
 function initSnow() {
+  if (!canvas) return;
   resizeCanvas();
   flakes.length = 0;
 
@@ -1416,6 +1420,8 @@ function initSnow() {
 }
 
 function drawSnow() {
+  if (!canvas || !ctx) return;
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   flakes.forEach(function (f) {
@@ -1460,6 +1466,7 @@ auth.onAuthStateChanged(function (user) {
 });
 
 window.addEventListener("resize", resizeCanvas);
+
 setInterval(refreshTimeTexts, 60000);
 
 refreshTimeTexts();
