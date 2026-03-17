@@ -549,19 +549,25 @@ function setManualBooking(buff, isOpen) {
 
       tabs[buff].manualOpen = isOpen;
 
-      return db.collection("settings").doc("booking").set({
-        baseDate: data.baseDate || bookingSettings.baseDate || "2026-03-23",
-        tabs: tabs
-      }, { merge: true });
-    })
-    .then(function () {
-      if (!bookingSettings.tabs) bookingSettings.tabs = {};
-      if (!bookingSettings.tabs[buff]) {
-        bookingSettings.tabs[buff] = { manualOpen: true, openAt: "", closeAt: "" };
+      // 🔥 핵심: 수동 오픈 시 openAt 초기화
+      if (isOpen) {
+        tabs[buff].openAt = "";
       }
 
+      return db.collection("settings").doc("booking").set({
+        baseDate: data.baseDate || bookingSettings.baseDate,
+        tabs: tabs
+      });
+    })
+    .then(function () {
       bookingSettings.tabs[buff].manualOpen = isOpen;
+
+      if (isOpen) {
+        bookingSettings.tabs[buff].openAt = "";
+      }
+
       renderAll();
+      refreshTimeTexts();
 
       return logAction("set_manual_booking", {
         buff: buff,
@@ -570,12 +576,12 @@ function setManualBooking(buff, isOpen) {
     })
     .then(function () {
       showToast(
-        isOpen ? "현재 탭 예약이 열렸습니다." : "현재 탭 예약이 잠겼습니다.",
+        isOpen ? "예약이 열렸습니다." : "예약이 잠겼습니다.",
         "success"
       );
     })
     .catch(function (error) {
-      console.error("setManualBooking error:", error);
+      console.error(error);
       showToast("예약 설정 변경 중 오류가 발생했습니다.", "error");
     });
 }
