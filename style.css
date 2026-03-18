@@ -109,9 +109,9 @@ h1 {
 
 /* ===== booking guide ===== */
 .bookingGuideGrid {
-  max-width: 860px;
+  max-width: 980px;
   margin: 8px auto 10px;
-  padding: 12px 16px;
+  padding: 12px 18px;
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(188, 208, 230, 0.7);
   border-radius: 14px;
@@ -132,7 +132,7 @@ h1 {
 .bookingGuideRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 26px;
+  gap: 34px;
   align-items: start;
   margin-bottom: 6px;
 }
@@ -168,6 +168,53 @@ h1 {
 .bookingGuideRow.notice .bookingGuideCol::before {
   content: "✦";
   color: #d6b347;
+}
+
+@media (max-width: 700px) {
+  .bookingGuideGrid {
+    max-width: calc(100% - 24px);
+    margin: 8px auto 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .bookingCloseText {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  .bookingGuideRow {
+    gap: 16px;
+    margin-bottom: 5px;
+  }
+
+  .bookingGuideCol {
+    font-size: 13px;
+    line-height: 1.5;
+    padding-left: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .bookingGuideRow {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .bookingGuideCol {
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .bookingGuideCol::before {
+    display: none;
+  }
+
+  .bookingGuideRow.notice {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dashed rgba(160, 178, 201, 0.65);
+  }
 }
 
 /* ===== tabs ===== */
