@@ -305,15 +305,15 @@ function updateBookingGuide() {
   guide.innerHTML =
     '<div id="bookingCloseText" class="bookingCloseText"></div>' +
     '<div class="bookingGuideRow">' +
-      '<div class="bookingGuideCol">Day 1 (Thu): 30d+ speed-up</div>' +
-      '<div class="bookingGuideCol">1일차 (목): 가속 30일 이상</div>' +
+      '<div class="bookingGuideCol">Day 1 (Thu) : 30d+ speed-up</div>' +
+      '<div class="bookingGuideCol">1일차 (목) : 가속 30일 이상</div>' +
     '</div>' +
     '<div class="bookingGuideRow">' +
-      '<div class="bookingGuideCol">Day 2 (Fri): 15d+ speed-up</div>' +
-      '<div class="bookingGuideCol">2일차 (금): 가속 15일 이상</div>' +
+      '<div class="bookingGuideCol">Day 2 (Fri) : 15d+ speed-up</div>' +
+      '<div class="bookingGuideCol">2일차 (금) : 가속 15일 이상</div>' +
     '</div>' +
     '<div class="bookingGuideRow">' +
-      '<div class="bookingGuideCol">Day 3+: Free booking</div>' +
+      '<div class="bookingGuideCol">Day 3+ : Free booking</div>' +
       '<div class="bookingGuideCol">3일차부터 자유 예약</div>' +
     '</div>' +
     '<div class="bookingGuideRow notice">' +
