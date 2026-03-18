@@ -316,8 +316,9 @@ function updateBookingGuide() {
       '<div class="bookingGuideCol">3일차부터 자유 예약</div>' +
     '</div>' +
     '<div class="bookingGuideRow notice">' +
-      '<div class="bookingGuideCol">To swap reserved slots, please send Mona a private message.</div>' +
-      '<div class="bookingGuideCol">예약된 자리를 서로 바꾸고 싶다면 Mona에게 개인메시지를 보내주세요.</div>' +
+      '<div class="bookingGuideCol">After the reservation site closes, please contact the Minister of the Interior or the President regarding any open slots.
+</div>' +
+      '<div class="bookingGuideCol">예약 사이트가 닫히고 빈자리에 관해서는 내무부장관이나 집행관에게 문의해주세요.</div>' +
     '</div>';
 }
 function refreshTimeTexts() {
