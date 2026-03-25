@@ -835,15 +835,25 @@ function generateSlots() {
     localDate.setUTCHours(Number(parts[0]), Number(parts[1]), 0, 0);
     var localEndDate = new Date(localDate.getTime() + 30 * 60 * 1000);
 
-    var localStart = localDate.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+function formatLocalTime(date) {
+  var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    var localEnd = localEndDate.toLocaleTimeString([], {
+  if (tz === "Asia/Seoul") {
+    return date.toLocaleTimeString("ko-KR", {
       hour: "2-digit",
       minute: "2-digit"
     });
+  } else {
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+  }
+}
+
+var localStart = formatLocalTime(localDate);
+var localEnd = formatLocalTime(localEndDate);
 
     var div = document.createElement("div");
     div.className = "slot";
